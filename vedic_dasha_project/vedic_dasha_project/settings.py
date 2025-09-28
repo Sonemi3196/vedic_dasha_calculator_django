@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-hai%+==$ug7nm15h)&j$uaxz8m0l&@20ot)#^)+oiaaf4^=3(@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['sonemi3196.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
