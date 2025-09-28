@@ -1,0 +1,2 @@
+web: gunicorn vedic_dasha_project.wsgi
+release: python manage.py migrate
