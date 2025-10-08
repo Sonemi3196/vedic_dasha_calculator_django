@@ -1,0 +1,247 @@
+{% extends "dasha_calculator/base.html" %}
+
+{% block title %}総合鑑定 - ヴェーダ数秘術{% endblock %}
+
+{% block nav_home %}bg-purple-600 text-white{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- 入力フォーム -->
+    <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">鑑定情報の入力</h2>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">名前（任意）</label>
+                <input type="text" id="name" placeholder="例: たなか or Tanaka" 
+                    class="w-full px-4 py-3 text-lg border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                <p class="text-xs text-gray-500 mt-1">ひらがな・カタカナ・アルファベットOK（数秘術計算に使用）</p>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">生年月日（必須）</label>
+                <input type="date" id="birthDate" required
+                    class="w-full px-4 py-3 text-lg border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+            </div>
+        </div>
+        
+        <button onclick="calculateAll()" 
+            class="w-full mt-6 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-md">
+            鑑定開始
+        </button>
+    </div>
+
+    <!-- 結果表示エリア -->
+    <div id="results" class="hidden">
+        <!-- タブ切り替え -->
+        <div class="flex border-b border-gray-300 mb-6">
+            <button onclick="switchTab('dasha')" id="tab-dasha" 
+                class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-purple-600 text-purple-600">
+                ダーシャ
+            </button>
+            <button onclick="switchTab('numerology')" id="tab-numerology" 
+                class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                数秘術
+            </button>
+        </div>
+
+        <!-- ダーシャタブ -->
+        <div id="content-dasha" class="tab-content">
+            <div id="dashaResults"></div>
+        </div>
+
+        <!-- 数秘術タブ -->
+        <div id="content-numerology" class="tab-content hidden">
+            <div id="numerologyResults"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentData = null;
+
+function calculateAll() {
+    const name = document.getElementById('name').value;
+    const birthDate = document.getElementById('birthDate').value;
+    
+    if (!birthDate) {
+        alert('生年月日を入力してください');
+        return;
+    }
+    
+    document.getElementById('results').classList.remove('hidden');
+    document.getElementById('dashaResults').innerHTML = '<div class="text-center py-8">計算中...</div>';
+    
+    fetch('/calculate/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, birth_date: birthDate })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            currentData = data;
+            displayDasha(data.dasha);
+            if (data.numerology) {
+                displayNumerology(data.numerology);
+            } else {
+                document.getElementById('numerologyResults').innerHTML = 
+                    '<div class="text-center py-8 text-gray-500">名前を入力すると数秘術結果が表示されます</div>';
+            }
+        } else {
+            alert('エラー: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('エラーが発生しました: ' + error.message);
+    });
+}
+
+function switchTab(tabName) {
+    // タブボタンの切り替え
+    document.querySelectorAll('[id^="tab-"]').forEach(btn => {
+        btn.classList.remove('border-purple-600', 'text-purple-600');
+        btn.classList.add('border-transparent', 'text-gray-500');
+    });
+    document.getElementById('tab-' + tabName).classList.add('border-purple-600', 'text-purple-600');
+    document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-gray-500');
+    
+    // コンテンツの切り替え
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    document.getElementById('content-' + tabName).classList.remove('hidden');
+}
+
+function displayDasha(dashaData) {
+    const html = `
+        <h3 class="text-xl font-bold text-gray-800 mb-4">ダーシャ（開始番号: ${dashaData.start_number}）</h3>
+        <div class="space-y-4">
+            ${dashaData.periods.map(period => `
+                <div class="border-2 ${period.is_current ? 'border-red-500 bg-red-50' : 'border-gray-200'} rounded-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-purple-500 to-blue-500 text-white p-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="text-3xl font-bold">${period.maha_dasha}</span>
+                                <span class="ml-3">マハーダーシャ ${period.maha_dasha} (${period.years}年間)</span>
+                            </div>
+                            <div class="text-right text-sm">
+                                <div>${period.start_date} 〜 ${period.end_date}</div>
+                                <div>${period.start_age}歳〜${period.end_age}歳</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 space-y-2">
+                        ${period.antara_dashas.map(antara => `
+                            <div class="flex justify-between items-center p-3 rounded ${antara.is_current ? 'bg-red-100 border-2 border-red-400' : 'bg-gray-50'}">
+                                <div>
+                                    <span class="inline-block w-8 h-8 bg-green-500 text-white rounded-full text-center leading-8 font-bold mr-2">${antara.number}</span>
+                                    <span class="font-medium">アンタラダーシャ ${antara.number} (${antara.days}日間)</span>
+                                </div>
+                                <div class="text-sm text-gray-600">
+                                    ${antara.start_date} 〜 ${antara.end_date} (${antara.start_age}歳〜${antara.end_age}歳)
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    document.getElementById('dashaResults').innerHTML = html;
+}
+
+function displayNumerology(numData) {
+    const numberColors = {
+        1: 'bg-red-500 text-white',
+        2: 'bg-gray-100 text-gray-900 border-4 border-gray-400',
+        3: 'bg-yellow-400 text-gray-900',
+        4: 'bg-black text-white',
+        5: 'bg-green-500 text-white',
+        6: 'bg-gray-100 text-gray-900 border-4 border-gray-400',
+        7: 'bg-gradient-to-r from-red-500 via-yellow-500 to-purple-500 text-white',
+        8: 'bg-blue-900 text-white',
+        9: 'bg-red-600 text-white'
+    };
+    
+    const meanings = {
+        1: '自我、自信、エゴ、プライド、地位、名誉、権力、バイタリティ',
+        2: '心、精神、変化、豊かさ、日常、家庭生活、内面',
+        3: '知恵、知識、道徳、幸運、修行、英知、拡大、発展、マントラ、先生',
+        4: '外交的、貪欲、中毒、快楽主義、物質主義',
+        5: '知識、学び、言葉、コミュニケーション、思考、星占術',
+        6: '恋愛、結婚、芸術、生物、音楽、文化、贅沢',
+        7: '内向的、純粋、無欲、禁欲主義、直感、オカルト',
+        8: '試練、努力、苦悩、障害、奉仕、農業、改革、奴隷',
+        9: '情熱、行動、集中力、欲望、怒り、短期、火、闘争、衝動'
+    };
+    
+    const html = `
+        <div class="space-y-6">
+            ${numData.converted_name !== document.getElementById('name').value.toUpperCase().replace(/[^A-Z]/g, '') ? 
+                `<div class="bg-blue-50 p-4 rounded-lg text-center">
+                    <strong>変換後:</strong> ${numData.converted_name}
+                </div>` : ''}
+            
+            <!-- グリッド -->
+            <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6">
+                <h3 class="text-xl font-bold text-center mb-4">グリッド</h3>
+                <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto">
+                    ${[3,1,9,6,7,5,2,8,4].map(n => 
+                        `<div class="aspect-square bg-white border-2 border-purple-300 rounded-lg flex items-center justify-center text-3xl font-bold text-purple-600">
+                            ${numData.grid[n] || ''}
+                        </div>`
+                    ).join('')}
+                </div>
+            </div>
+
+            <!-- 3つの番号 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-6 rounded-lg text-center ${numberColors[numData.bhagyank.final]}">
+                    <h4 class="font-bold mb-2">バーギャング</h4>
+                    <p class="text-xs mb-3 opacity-80">人生全体の運命</p>
+                    <div class="text-5xl font-bold mb-3">${numData.bhagyank.final}</div>
+                    <p class="text-xs">${meanings[numData.bhagyank.final]}</p>
+                </div>
+                <div class="p-6 rounded-lg text-center ${numberColors[numData.moolank.final]}">
+                    <h4 class="font-bold mb-2">ムーランク</h4>
+                    <p class="text-xs mb-3 opacity-80">基本的な性格</p>
+                    <div class="text-5xl font-bold mb-3">${numData.moolank.final}</div>
+                    <p class="text-xs">${meanings[numData.moolank.final]}</p>
+                </div>
+                <div class="p-6 rounded-lg text-center ${numberColors[numData.name_number.final]}">
+                    <h4 class="font-bold mb-2">名前番号</h4>
+                    <p class="text-xs mb-3 opacity-80">才能と成長方向</p>
+                    <div class="text-5xl font-bold mb-3">${numData.name_number.final}</div>
+                    <p class="text-xs">${meanings[numData.name_number.final]}</p>
+                </div>
+            </div>
+
+            <!-- 文字の内訳 -->
+            <div class="bg-purple-50 rounded-lg p-6">
+                <h4 class="font-bold mb-3">文字ごとの数値</h4>
+                <div class="flex flex-wrap gap-2">
+                    ${numData.letter_values.map(lv => 
+                        `<div class="bg-white px-3 py-2 rounded border-2 border-purple-200">
+                            <span class="font-bold text-purple-600">${lv.letter}</span>
+                            <span class="mx-1">→</span>
+                            <span>${lv.value}</span>
+                        </div>`
+                    ).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById('numerologyResults').innerHTML = html;
+}
+
+// 初期値設定
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const thirtyYearsAgo = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
+    document.getElementById('birthDate').value = thirtyYearsAgo.toISOString().split('T')[0];
+});
+</script>
+{% endblock %}

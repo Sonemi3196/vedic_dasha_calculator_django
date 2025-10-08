@@ -1,0 +1,463 @@
+{% extends "dasha_calculator/base.html" %}
+
+{% block title %}ダーシャ比較 - ヴェーダ数秘術{% endblock %}
+
+{% block nav_compare %}bg-purple-600 text-white{% endblock %}
+
+{% block extra_css %}
+<style>
+    .input-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 15px;
+    }
+    
+    .person-input {
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #555;
+    }
+    
+    input, select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+    
+    button {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        width: 100%;
+        grid-column: 1 / -1;
+        margin-top: 20px;
+    }
+    
+    .filter-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+    }
+    
+    .filter-controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .year-group {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        margin: 10px 0;
+        overflow: hidden;
+    }
+    
+    .year-header {
+        background: #667eea;
+        color: white;
+        padding: 15px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        user-select: none;
+    }
+    
+    .year-header:hover {
+        background: #5568d3;
+    }
+    
+    .year-header .toggle-icon {
+        font-size: 20px;
+        transition: transform 0.3s;
+    }
+    
+    .year-header.collapsed .toggle-icon {
+        transform: rotate(-90deg);
+    }
+    
+    .year-content {
+        max-height: 2000px;
+        transition: max-height 0.3s ease-out;
+        overflow: hidden;
+    }
+    
+    .year-content.collapsed {
+        max-height: 0;
+    }
+    
+    .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+    }
+    
+    .comparison-table th {
+        background: #667eea;
+        color: white;
+        font-weight: bold;
+    }
+    
+    .comparison-table tr:nth-child(even) {
+        background: #f8f9fa;
+    }
+    
+    .maha-number {
+        display: inline-block;
+        background: #667eea;
+        color: white;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 25px;
+        font-size: 12px;
+        margin-right: 5px;
+    }
+    
+    .antara-number {
+        display: inline-block;
+        background: #28a745;
+        color: white;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 20px;
+        font-size: 10px;
+    }
+    
+    .current-row {
+        background: #ffe6e6 !important;
+        border-left: 4px solid #ff6b6b;
+    }
+    
+    .age-display {
+        font-size: 12px;
+        color: #666;
+    }
+    
+    .nav-button {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 0 5px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    .expand-collapse-all {
+        margin: 10px 0;
+    }
+    
+    .hidden {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-bold text-gray-800 mb-4">ダーシャ比較</h2>
+
+<div class="input-section">
+    <div class="person-input">
+        <h3>人A</h3>
+        <div class="form-group">
+            <label for="personAName">名前:</label>
+            <input type="text" id="personAName" value="人A" placeholder="名前を入力">
+        </div>
+        <div class="form-group">
+            <label for="personABirth">生年月日:</label>
+            <input type="date" id="personABirth" required>
+        </div>
+    </div>
+    
+    <div class="person-input">
+        <h3>人B</h3>
+        <div class="form-group">
+            <label for="personBName">名前:</label>
+            <input type="text" id="personBName" value="人B" placeholder="名前を入力">
+        </div>
+        <div class="form-group">
+            <label for="personBBirth">生年月日:</label>
+            <input type="date" id="personBBirth" required>
+        </div>
+    </div>
+    
+    <button onclick="compareDeshas()">比較開始</button>
+</div>
+
+<div id="filterSection" class="filter-section hidden">
+    <h3>検索・フィルター</h3>
+    <div class="filter-controls">
+        <div class="form-group">
+            <label for="filterYear">年で検索:</label>
+            <input type="number" id="filterYear" placeholder="例: 2025">
+        </div>
+        <div class="form-group">
+            <label for="filterAge">年齢で検索:</label>
+            <input type="number" id="filterAge" placeholder="例: 30">
+        </div>
+        <div class="form-group">
+            <label for="filterMaha">マハーダーシャ:</label>
+            <select id="filterMaha">
+                <option value="">全て</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+            </select>
+        </div>
+    </div>
+    <div class="expand-collapse-all">
+        <button class="nav-button" onclick="expandAll()">全て展開</button>
+        <button class="nav-button" onclick="collapseAll()">全て折りたたむ</button>
+        <button class="nav-button" onclick="applyFilter()">フィルター適用</button>
+        <button class="nav-button" onclick="clearFilter()">クリア</button>
+    </div>
+</div>
+
+<div id="results"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let allData = null;
+let filteredData = null;
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function compareDeshas() {
+    const personAName = document.getElementById('personAName').value;
+    const personBName = document.getElementById('personBName').value;
+    const personABirth = document.getElementById('personABirth').value;
+    const personBBirth = document.getElementById('personBBirth').value;
+
+    if (!personABirth || !personBBirth) {
+        alert('両方の生年月日を入力してください');
+        return;
+    }
+
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '<div class="text-center py-8">計算中...</div>';
+
+    fetch('/compare/calculate/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            person_a_name: personAName,
+            person_a_birth: personABirth,
+            person_b_name: personBName,
+            person_b_birth: personBBirth
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            allData = data;
+            filteredData = data.timeline;
+            document.getElementById('filterSection').classList.remove('hidden');
+            displayComparison();
+        } else {
+            resultsDiv.innerHTML = `<div class="text-red-600 text-center">エラー: ${data.error}</div>`;
+        }
+    })
+    .catch(error => {
+        resultsDiv.innerHTML = `<div class="text-red-600 text-center">エラー: ${error.message}</div>`;
+    });
+}
+
+function displayComparison() {
+    const resultsDiv = document.getElementById('results');
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
+    
+    const yearGroups = {};
+    filteredData.forEach(item => {
+        if (!yearGroups[item.year]) {
+            yearGroups[item.year] = [];
+        }
+        yearGroups[item.year].push(item);
+    });
+    
+    let html = '<h2 class="text-xl font-bold mb-4">ダーシャ比較結果</h2>';
+    
+    Object.keys(yearGroups).sort((a, b) => a - b).forEach(year => {
+        const isCurrentYear = parseInt(year) === currentYear;
+        const yearData = yearGroups[year];
+        
+        html += `
+            <div class="year-group">
+                <div class="year-header ${isCurrentYear ? '' : 'collapsed'}" onclick="toggleYear(this)">
+                    <strong>${year}年 (${yearData.length}ヶ月)</strong>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="year-content ${isCurrentYear ? '' : 'collapsed'}">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>年月</th>
+                                <th>${allData.person_a_name}</th>
+                                <th>${allData.person_b_name}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+        
+        yearData.forEach(item => {
+            const isCurrentMonth = item.year === currentYear && item.month === currentMonth;
+            const rowClass = isCurrentMonth ? 'current-row' : '';
+            
+            html += `<tr class="${rowClass}">`;
+            html += `<td><strong>${item.date_str}</strong></td>`;
+            
+            html += `<td>`;
+            if (item.person_a_age !== null) {
+                html += `<div class="age-display">${item.person_a_age}歳</div>`;
+                if (item.person_a_maha) {
+                    html += `<span class="maha-number">${item.person_a_maha}</span>`;
+                    if (item.person_a_antara) {
+                        html += `<span class="antara-number">${item.person_a_antara}</span>`;
+                    }
+                }
+            } else {
+                html += `<span style="color: #ccc;">未誕生</span>`;
+            }
+            html += `</td>`;
+            
+            html += `<td>`;
+            if (item.person_b_age !== null) {
+                html += `<div class="age-display">${item.person_b_age}歳</div>`;
+                if (item.person_b_maha) {
+                    html += `<span class="maha-number">${item.person_b_maha}</span>`;
+                    if (item.person_b_antara) {
+                        html += `<span class="antara-number">${item.person_b_antara}</span>`;
+                    }
+                }
+            } else {
+                html += `<span style="color: #ccc;">未誕生</span>`;
+            }
+            html += `</td>`;
+            html += `</tr>`;
+        });
+        
+        html += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += `
+        <div style="margin-top: 20px; font-size: 14px; color: #666;">
+            <p><span class="maha-number">5</span> = マハーダーシャ番号</p>
+            <p><span class="antara-number">3</span> = アンタラダーシャ番号</p>
+        </div>
+    `;
+    
+    resultsDiv.innerHTML = html;
+}
+
+function toggleYear(header) {
+    header.classList.toggle('collapsed');
+    const content = header.nextElementSibling;
+    content.classList.toggle('collapsed');
+}
+
+function expandAll() {
+    document.querySelectorAll('.year-header').forEach(h => h.classList.remove('collapsed'));
+    document.querySelectorAll('.year-content').forEach(c => c.classList.remove('collapsed'));
+}
+
+function collapseAll() {
+    document.querySelectorAll('.year-header').forEach(h => h.classList.add('collapsed'));
+    document.querySelectorAll('.year-content').forEach(c => c.classList.add('collapsed'));
+}
+
+function applyFilter() {
+    const filterYear = document.getElementById('filterYear').value;
+    const filterAge = document.getElementById('filterAge').value;
+    const filterMaha = document.getElementById('filterMaha').value;
+    
+    filteredData = allData.timeline.filter(item => {
+        if (filterYear && item.year !== parseInt(filterYear)) return false;
+        if (filterAge && item.person_a_age !== parseInt(filterAge) && item.person_b_age !== parseInt(filterAge)) return false;
+        if (filterMaha && item.person_a_maha !== parseInt(filterMaha) && item.person_b_maha !== parseInt(filterMaha)) return false;
+        return true;
+    });
+    
+    displayComparison();
+    expandAll();
+}
+
+function clearFilter() {
+    document.getElementById('filterYear').value = '';
+    document.getElementById('filterAge').value = '';
+    document.getElementById('filterMaha').value = '';
+    filteredData = allData.timeline;
+    displayComparison();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const thirtyYearsAgo = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
+    const twentyFiveYearsAgo = new Date(today.getFullYear() - 25, today.getMonth(), today.getDate());
+    
+    document.getElementById('personABirth').value = thirtyYearsAgo.toISOString().split('T')[0];
+    document.getElementById('personBBirth').value = twentyFiveYearsAgo.toISOString().split('T')[0];
+});
+</script>
+{% endblock %}

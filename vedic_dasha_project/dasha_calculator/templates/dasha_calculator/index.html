@@ -185,7 +185,12 @@
 <body>
     <div class="container">
         <h1>🔮 ヴェーダ数秘術ダーシャ計算ツール</h1>
-        
+        <!-- ナビゲーション -->
+        <div class="mb-6 flex justify-center gap-4">
+            <a href="/" class="px-4 py-2 bg-blue-500 text-white rounded-lg">ダーシャ計算</a>
+            <a href="/numerology/" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">数秘術</a>
+            <a href="/compare/" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">ダーシャ比較</a>
+        </div>
         <div class="info-box">
             <strong>使い方：</strong> 生年月日を入力すると、マハーダシャとアンタラダシャの期間を自動計算します。<br>
             マハーダシャは1〜9年の周期で、アンタラダシャはその期間内でさらに細分化された期間です。<br>
@@ -202,7 +207,12 @@
         
         <div id="results" class="results"></div>
     </div>
-
+<!-- ナビゲーションセクションを追加 -->
+    <div class="navigation" style="text-align: center; margin: 20px 0;">
+        <a href="/compare/" style="background: #28a745; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; display: inline-block;">
+            👥 2人のダーシャを比較する
+        </a>
+    </div>
     <script>
         function calculateDasha() {
             const birthdate = document.getElementById('birthdate').value;

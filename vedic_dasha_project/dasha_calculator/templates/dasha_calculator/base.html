@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ヴェーダ数秘術ツール{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100">
+    <div class="p-4 md:p-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- 共通ヘッダー -->
+            <div class="bg-white rounded-t-2xl shadow-xl p-6">
+                <h1 class="text-3xl font-bold text-center text-gray-800 mb-4">ヴェーダ数秘術総合ツール</h1>
+                
+                <!-- ナビゲーションタブ -->
+                <nav class="flex justify-center gap-2 mb-4">
+                    <a href="/" class="px-4 py-2 rounded-lg transition {% block nav_home %}bg-gray-200 hover:bg-gray-300{% endblock %}">
+                        総合鑑定
+                    </a>
+                    <a href="/compare/" class="px-4 py-2 rounded-lg transition {% block nav_compare %}bg-gray-200 hover:bg-gray-300{% endblock %}">
+                        2人の比較
+                    </a>
+                </nav>
+            </div>
+
+            <!-- メインコンテンツ -->
+            <div class="bg-white rounded-b-2xl shadow-xl p-6">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

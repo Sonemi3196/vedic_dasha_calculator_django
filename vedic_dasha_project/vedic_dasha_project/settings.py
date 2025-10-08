@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'dasha_calculator',
+    'numerology_calculator', 
 ]
 
 MIDDLEWARE = [
