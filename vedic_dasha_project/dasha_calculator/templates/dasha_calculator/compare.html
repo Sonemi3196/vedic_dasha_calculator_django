@@ -416,6 +416,7 @@ function compareAll() {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken')
         },
+        credentials: 'include',  // ← これがないとクッキーが送られない！
         body: JSON.stringify({
             person_a_name: personAName,
             person_a_birth: personABirth,

@@ -132,3 +132,11 @@ if 'DYNO' in os.environ:  # Heroku環境の場合のみ
         pass
 
 APPEND_SLASH = False  # 末尾のスラッシュ自動追加を無効化
+
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost',
+    'http://127.0.0.1',
+    'https://sonemi3196.pythonanywhere.com'
+]
