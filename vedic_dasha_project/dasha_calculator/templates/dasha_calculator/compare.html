@@ -183,11 +183,91 @@
     .hidden {
         display: none;
     }
-</style>
+    .date-input-group {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 10px;
+    }
+
+    .date-input-group input,
+    .date-input-group select {
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+
+    .date-input-group input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+    .date-input-group input[type="number"]::-webkit-outer-spin-button,
+    .date-input-group input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    /* 数字ごとの色分け */
+    .maha-1 { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
+    .maha-2 { background: linear-gradient(135deg, #f97316, #ea580c) !important; }
+    .maha-3 { background: linear-gradient(135deg, #eab308, #ca8a04) !important; }
+    .maha-4 { background: linear-gradient(135deg, #10b981, #059669) !important; }
+    .maha-5 { background: linear-gradient(135deg, #14b8a6, #0d9488) !important; }
+    .maha-6 { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; }
+    .maha-7 { background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important; }
+    .maha-8 { background: linear-gradient(135deg, #ec4899, #db2777) !important; }
+    .maha-9 { background: linear-gradient(135deg, #f43f5e, #e11d48) !important; }
+
+    .antara-1 { background: linear-gradient(135deg, #fca5a5, #ef4444) !important; }
+    .antara-2 { background: linear-gradient(135deg, #fdba74, #f97316) !important; }
+    .antara-3 { background: linear-gradient(135deg, #fde047, #eab308) !important; }
+    .antara-4 { background: linear-gradient(135deg, #6ee7b7, #10b981) !important; }
+    .antara-5 { background: linear-gradient(135deg, #5eead4, #14b8a6) !important; }
+    .antara-6 { background: linear-gradient(135deg, #93c5fd, #3b82f6) !important; }
+    .antara-7 { background: linear-gradient(135deg, #c4b5fd, #8b5cf6) !important; }
+    .antara-8 { background: linear-gradient(135deg, #f9a8d4, #ec4899) !important; }
+    .antara-9 { background: linear-gradient(135deg, #fda4af, #f43f5e) !important; }
+
+    /* ボタンの色分け */
+    .nav-button {
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 0 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .nav-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    /* 各ボタンごとの色 */
+    .btn-expand {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .btn-collapse {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .btn-filter {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    .btn-clear {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .btn-back {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+    }
+    </style>
 {% endblock %}
 
 {% block content %}
-<h2 class="text-2xl font-bold text-gray-800 mb-4">ダーシャ比較</h2>
+<h2 class="text-2xl font-bold text-gray-800 mb-4">2人の比較</h2>
 
 <div class="input-section">
     <div class="person-input">
@@ -214,51 +294,75 @@
         </div>
     </div>
     
-    <button onclick="compareDeshas()">比較開始</button>
+    <button onclick="compareAll()">比較開始</button>
 </div>
 
-<div id="filterSection" class="filter-section hidden">
-    <h3>検索・フィルター</h3>
-    <div class="filter-controls">
-        <div class="form-group">
-            <label for="filterYear">年で検索:</label>
-            <input type="number" id="filterYear" placeholder="例: 2025">
-        </div>
-        <div class="form-group">
-            <label for="filterAge">年齢で検索:</label>
-            <input type="number" id="filterAge" placeholder="例: 30">
-        </div>
-        <div class="form-group">
-            <label for="filterMaha">マハーダーシャ:</label>
-            <select id="filterMaha">
-                <option value="">全て</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-            </select>
-        </div>
+<!-- 結果表示エリア -->
+<div id="resultsContainer" class="hidden">
+    <!-- タブ切り替え（総合鑑定と同じスタイル） -->
+    <div class="flex border-b border-gray-300 mb-6">
+        <button onclick="switchCompareTab('dasha')" id="tab-dasha" 
+            class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-purple-600 text-purple-600">
+            ダーシャ比較
+        </button>
+        <button onclick="switchCompareTab('grid')" id="tab-grid" 
+            class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+            グリッド比較
+        </button>
     </div>
-    <div class="expand-collapse-all">
-        <button class="nav-button" onclick="expandAll()">全て展開</button>
-        <button class="nav-button" onclick="collapseAll()">全て折りたたむ</button>
-        <button class="nav-button" onclick="applyFilter()">フィルター適用</button>
-        <button class="nav-button" onclick="clearFilter()">クリア</button>
+
+    <!-- ダーシャ比較タブ -->
+    <div id="content-dasha" class="tab-content">
+        <div id="filterSection" class="filter-section hidden">
+            <h3>検索・フィルター</h3>
+            <div class="filter-controls">
+                <div class="form-group">
+                    <label for="filterYear">年で検索:</label>
+                    <input type="number" id="filterYear" placeholder="例: 2025">
+                </div>
+                <div class="form-group">
+                    <label for="filterAge">年齢で検索:</label>
+                    <input type="number" id="filterAge" placeholder="例: 30">
+                </div>
+                <div class="form-group">
+                    <label for="filterMaha">マハーダーシャ:</label>
+                    <select id="filterMaha">
+                        <option value="">全て</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                    </select>
+                </div>
+            </div>
+            <div class="expand-collapse-all">
+                <button class="nav-button btn-expand" onclick="expandAll()">📂 全て展開</button>
+                <button class="nav-button btn-collapse" onclick="collapseAll()">📁 全て折りたたむ</button>
+                <button class="nav-button btn-filter" onclick="applyFilter()">🔍 フィルター適用</button>
+                <button class="nav-button btn-clear" onclick="clearFilter()">🔄 クリア</button>
+            </div>
+        </div>
+        <div id="dashaResults"></div>
+    </div>
+
+    <!-- グリッド比較タブ -->
+    <div id="content-grid" class="tab-content hidden">
+        <div id="gridResults"></div>
     </div>
 </div>
-
-<div id="results"></div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 let allData = null;
 let filteredData = null;
+let personAData = null;
+let personBData = null;
 
 function getCookie(name) {
     let cookieValue = null;
@@ -275,7 +379,23 @@ function getCookie(name) {
     return cookieValue;
 }
 
-function compareDeshas() {
+function switchCompareTab(tabName) {
+    // タブボタンの切り替え
+    document.querySelectorAll('[id^="tab-"]').forEach(btn => {
+        btn.classList.remove('border-purple-600', 'text-purple-600');
+        btn.classList.add('border-transparent', 'text-gray-500');
+    });
+    document.getElementById('tab-' + tabName).classList.add('border-purple-600', 'text-purple-600');
+    document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-gray-500');
+    
+    // コンテンツの切り替え
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    document.getElementById('content-' + tabName).classList.remove('hidden');
+}
+
+function compareAll() {
     const personAName = document.getElementById('personAName').value;
     const personBName = document.getElementById('personBName').value;
     const personABirth = document.getElementById('personABirth').value;
@@ -286,9 +406,10 @@ function compareDeshas() {
         return;
     }
 
-    const resultsDiv = document.getElementById('results');
-    resultsDiv.innerHTML = '<div class="text-center py-8">計算中...</div>';
+    document.getElementById('resultsContainer').classList.remove('hidden');
+    document.getElementById('dashaResults').innerHTML = '<div class="text-center py-8">計算中...</div>';
 
+    // ダーシャ比較データを取得
     fetch('/compare/calculate/', {
         method: 'POST',
         headers: {
@@ -308,18 +429,48 @@ function compareDeshas() {
             allData = data;
             filteredData = data.timeline;
             document.getElementById('filterSection').classList.remove('hidden');
-            displayComparison();
+            displayDashaComparison();
         } else {
-            resultsDiv.innerHTML = `<div class="text-red-600 text-center">エラー: ${data.error}</div>`;
+            document.getElementById('dashaResults').innerHTML = `<div class="text-red-600 text-center">エラー: ${data.error}</div>`;
         }
     })
     .catch(error => {
-        resultsDiv.innerHTML = `<div class="text-red-600 text-center">エラー: ${error.message}</div>`;
+        document.getElementById('dashaResults').innerHTML = `<div class="text-red-600 text-center">エラー: ${error.message}</div>`;
+    });
+
+    // 各人の数秘術データを取得
+    fetchNumerologyData(personAName, personABirth, 'A');
+    fetchNumerologyData(personBName, personBBirth, 'B');
+}
+
+function fetchNumerologyData(name, birthDate, person) {
+    fetch('/calculate/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, birth_date: birthDate })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.numerology) {
+            if (person === 'A') {
+                personAData = data.numerology;
+            } else {
+                personBData = data.numerology;
+            }
+            
+            // 両方のデータが揃ったらグリッド比較を表示
+            if (personAData && personBData) {
+                displayGridComparison();
+            }
+        }
+    })
+    .catch(error => {
+        console.error('数秘術データ取得エラー:', error);
     });
 }
 
-function displayComparison() {
-    const resultsDiv = document.getElementById('results');
+function displayDashaComparison() {
+    const resultsDiv = document.getElementById('dashaResults');
     const today = new Date();
     const currentYear = today.getFullYear();
     const currentMonth = today.getMonth() + 1;
@@ -367,9 +518,9 @@ function displayComparison() {
             if (item.person_a_age !== null) {
                 html += `<div class="age-display">${item.person_a_age}歳</div>`;
                 if (item.person_a_maha) {
-                    html += `<span class="maha-number">${item.person_a_maha}</span>`;
+                    html += `<span class="maha-number maha-${item.person_a_maha}">${item.person_a_maha}</span>`;
                     if (item.person_a_antara) {
-                        html += `<span class="antara-number">${item.person_a_antara}</span>`;
+                        html += `<span class="antara-number antara-${item.person_a_antara}">${item.person_a_antara}</span>`;
                     }
                 }
             } else {
@@ -381,9 +532,9 @@ function displayComparison() {
             if (item.person_b_age !== null) {
                 html += `<div class="age-display">${item.person_b_age}歳</div>`;
                 if (item.person_b_maha) {
-                    html += `<span class="maha-number">${item.person_b_maha}</span>`;
+                    html += `<span class="maha-number maha-${item.person_b_maha}">${item.person_b_maha}</span>`;
                     if (item.person_b_antara) {
-                        html += `<span class="antara-number">${item.person_b_antara}</span>`;
+                        html += `<span class="antara-number antara-${item.person_b_antara}">${item.person_b_antara}</span>`;
                     }
                 }
             } else {
@@ -410,6 +561,91 @@ function displayComparison() {
     
     resultsDiv.innerHTML = html;
 }
+
+function displayGridComparison() {
+    if (!personAData || !personBData) {
+        document.getElementById('gridResults').innerHTML = '<div class="text-center py-8">データ読み込み中...</div>';
+        return;
+    }
+    
+    const gridA = personAData.grid;
+    const gridB = personBData.grid;
+    
+    let html = `
+        <h2 class="text-xl font-bold mb-4">グリッド比較</h2>
+        
+        <!-- 凡例 -->
+        <div class="flex justify-center gap-6 mb-6 p-4 bg-gray-50 rounded-lg">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded" style="background: linear-gradient(135deg, #a855f7, #9333ea);"></div>
+                <span class="font-semibold">${allData.person_a_name}</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div>
+                <span class="font-semibold">${allData.person_b_name}</span>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <!-- 人A -->
+            <div>
+                <h3 class="text-lg font-bold text-center mb-4 text-purple-600">${allData.person_a_name}</h3>
+                <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto">
+                    ${[3,1,9,6,7,5,2,8,4].map(n => 
+                        `<div class="aspect-square bg-white border-2 border-purple-300 rounded-lg flex items-center justify-center text-3xl font-bold text-purple-600">
+                            ${gridA[n] || ''}
+                        </div>`
+                    ).join('')}
+                </div>
+            </div>
+            
+            <!-- 人B -->
+            <div>
+                <h3 class="text-lg font-bold text-center mb-4 text-blue-600">${allData.person_b_name}</h3>
+                <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto">
+                    ${[3,1,9,6,7,5,2,8,4].map(n => 
+                        `<div class="aspect-square bg-white border-2 border-blue-300 rounded-lg flex items-center justify-center text-3xl font-bold text-blue-600">
+                            ${gridB[n] || ''}
+                        </div>`
+                    ).join('')}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 重ね合わせグリッド -->
+        <div>
+            <h3 class="text-lg font-bold text-center mb-4">重ね合わせ</h3>
+            <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto">
+                ${[3,1,9,6,7,5,2,8,4].map(n => {
+                    const strA = gridA[n] || '';
+                    const strB = gridB[n] || '';
+                    
+                    // 人Aの数字（紫）と人Bの数字（青）を色分けして表示
+                    let displayContent = '';
+                    
+                    // 人Aの数字を紫で表示
+                    if (strA) {
+                        displayContent += `<span style="color: #a855f7;">${strA}</span>`;
+                    }
+                    
+                    // 人Bの数字を青で表示
+                    if (strB) {
+                        displayContent += `<span style="color: #3b82f6;">${strB}</span>`;
+                    }
+                    
+                    // 持っていない場合は空のマス
+                    return `<div class="aspect-square bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center text-3xl font-bold p-2" style="letter-spacing: -3px; line-height: 1;">
+                        ${displayContent || ''}
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('gridResults').innerHTML = html;
+}
+
+// 以下、既存の関数（toggleYear, expandAll, collapseAll, applyFilter, clearFilter）
 
 function toggleYear(header) {
     header.classList.toggle('collapsed');
@@ -439,7 +675,7 @@ function applyFilter() {
         return true;
     });
     
-    displayComparison();
+    displayDashaComparison();
     expandAll();
 }
 
@@ -448,15 +684,28 @@ function clearFilter() {
     document.getElementById('filterAge').value = '';
     document.getElementById('filterMaha').value = '';
     filteredData = allData.timeline;
-    displayComparison();
+    displayDashaComparison();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const today = new Date();
-    const thirtyYearsAgo = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
-    const twentyFiveYearsAgo = new Date(today.getFullYear() - 25, today.getMonth(), today.getDate());
+    // LocalStorageから人Aのデータを読み込み
+    const personAName = localStorage.getItem('personA_name');
+    const personABirth = localStorage.getItem('personA_birth');
     
-    document.getElementById('personABirth').value = thirtyYearsAgo.toISOString().split('T')[0];
+    if (personAName) {
+        document.getElementById('personAName').value = personAName;
+    }
+    
+    if (personABirth) {
+        document.getElementById('personABirth').value = personABirth;
+    } else {
+        const today = new Date();
+        const thirtyYearsAgo = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
+        document.getElementById('personABirth').value = thirtyYearsAgo.toISOString().split('T')[0];
+    }
+    
+    const today = new Date();
+    const twentyFiveYearsAgo = new Date(today.getFullYear() - 25, today.getMonth(), today.getDate());
     document.getElementById('personBBirth').value = twentyFiveYearsAgo.toISOString().split('T')[0];
 });
 </script>

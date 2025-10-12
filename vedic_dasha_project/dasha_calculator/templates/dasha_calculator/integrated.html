@@ -5,6 +5,31 @@
 {% block nav_home %}bg-purple-600 text-white{% endblock %}
 
 {% block content %}
+<style>
+.date-input-group {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 10px;
+}
+
+.date-input-group input,
+.date-input-group select {
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.date-input-group input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.date-input-group input[type="number"]::-webkit-outer-spin-button,
+.date-input-group input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+</style>
 <div class="space-y-6">
     <!-- 入力フォーム -->
     <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6">
@@ -19,10 +44,36 @@
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">生年月日（必須）</label>
-                <input type="date" id="birthDate" required
-                    class="w-full px-4 py-3 text-lg border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+            <label class="block text-sm font-medium text-gray-700 mb-2">生年月日（必須）</label>
+            <div class="date-input-group">
+                <input type="number" id="birthYear" placeholder="年（例: 1989）" min="1900" max="2025" required>
+                <select id="birthMonth" required>
+                    <option value="">月</option>
+                    <option value="1">1月</option>
+                    <option value="2">2月</option>
+                    <option value="3">3月</option>
+                    <option value="4">4月</option>
+                    <option value="5">5月</option>
+                    <option value="6">6月</option>
+                    <option value="7">7月</option>
+                    <option value="8">8月</option>
+                    <option value="9">9月</option>
+                    <option value="10">10月</option>
+                    <option value="11">11月</option>
+                    <option value="12">12月</option>
+                </select>
+                <select id="birthDay" required>
+                    <option value="">日</option>
+                    <!-- 1-31をJavaScriptで生成 -->
+                </select>
             </div>
+            <!-- 生年月日入力の下に追加 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">表示年齢（デフォルト: 140歳）</label>
+                <input type="number" id="maxAge" value="140" min="50" max="200" 
+                    class="w-full px-4 py-3 text-lg border-2 border-purple-300 rounded-lg">
+            </div>
+</div>
         </div>
         
         <button onclick="calculateAll()" 
@@ -62,14 +113,79 @@
 <script>
 let currentData = null;
 
+// 日付のセレクトボックスを生成
+for (let i = 1; i <= 31; i++) {
+    const option = document.createElement('option');
+    option.value = i;
+    option.textContent = i + '日';
+    document.getElementById('birthDay').appendChild(option);
+}
+
+// 比較ページ用の日付生成も同様に
+if (document.getElementById('personABirthDay')) {
+    for (let i = 1; i <= 31; i++) {
+        const option1 = document.createElement('option');
+        option1.value = i;
+        option1.textContent = i + '日';
+        document.getElementById('personABirthDay').appendChild(option1);
+        
+        const option2 = document.createElement('option');
+        option2.value = i;
+        option2.textContent = i + '日';
+        document.getElementById('personBBirthDay').appendChild(option2);
+    }
+}
+
+function goToComparison() {
+    // 現在入力されているデータを取得
+    const name = document.getElementById('name').value;
+    const birthDate = getBirthDate();
+    
+    if (birthDate) {
+        // LocalStorageに保存
+        localStorage.setItem('personA_name', name || '人A');
+        localStorage.setItem('personA_birth', birthDate);
+    }
+    
+    window.location.href = '/compare/';
+}
+
+// 生年月日を取得する関数（既存の birthDate 取得部分を置き換え）
+function getBirthDate() {
+    const year = document.getElementById('birthYear').value;
+    const month = document.getElementById('birthMonth').value;
+    const day = document.getElementById('birthDay').value;
+    
+    if (!year || !month || !day) {
+        return null;
+    }
+    
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+}
+
+
+
 function calculateAll() {
     const name = document.getElementById('name').value;
-    const birthDate = document.getElementById('birthDate').value;
+    const birthYear = document.getElementById('birthYear').value;
+    const birthMonth = document.getElementById('birthMonth').value;
+    const birthDay = document.getElementById('birthDay').value;
+    const maxAge = parseInt(document.getElementById('maxAge').value) || 140;
     
-    if (!birthDate) {
-        alert('生年月日を入力してください');
+    // LocalStorageに保存
+    localStorage.setItem('last_name', name);
+    localStorage.setItem('last_year', birthYear);
+    localStorage.setItem('last_month', birthMonth);
+    localStorage.setItem('last_day', birthDay);
+    localStorage.setItem('last_maxAge', maxAge);
+    
+    // 生年月日の組み立て
+    if (!birthYear || !birthMonth || !birthDay) {
+        alert('生年月日を全て入力してください');
         return;
     }
+    
+    const birthDate = `${birthYear}-${birthMonth.padStart(2, '0')}-${birthDay.padStart(2, '0')}`;
     
     document.getElementById('results').classList.remove('hidden');
     document.getElementById('dashaResults').innerHTML = '<div class="text-center py-8">計算中...</div>';
@@ -77,7 +193,11 @@ function calculateAll() {
     fetch('/calculate/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, birth_date: birthDate })
+        body: JSON.stringify({ 
+            name: name, 
+            birth_date: birthDate,
+            max_age: maxAge  // 追加
+        })
     })
     .then(response => response.json())
     .then(data => {
@@ -197,8 +317,8 @@ function displayNumerology(numData) {
                 </div>
             </div>
 
-            <!-- 3つの番号 -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- 4つの番号（カルマ追加） -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="p-6 rounded-lg text-center ${numberColors[numData.bhagyank.final]}">
                     <h4 class="font-bold mb-2">バーギャング</h4>
                     <p class="text-xs mb-3 opacity-80">人生全体の運命</p>
@@ -217,7 +337,14 @@ function displayNumerology(numData) {
                     <div class="text-5xl font-bold mb-3">${numData.name_number.final}</div>
                     <p class="text-xs">${meanings[numData.name_number.final]}</p>
                 </div>
+                <div class="p-6 rounded-lg text-center ${numberColors[numData.karma.final]}">
+                    <h4 class="font-bold mb-2">カルマ</h4>
+                    <p class="text-xs mb-3 opacity-80">過去世からの課題</p>
+                    <div class="text-5xl font-bold mb-3">${numData.karma.final}</div>
+                    <p class="text-xs">${meanings[numData.karma.final]}</p>
+                </div>
             </div>
+            
 
             <!-- 文字の内訳 -->
             <div class="bg-purple-50 rounded-lg p-6">
@@ -239,9 +366,58 @@ function displayNumerology(numData) {
 
 // 初期値設定
 document.addEventListener('DOMContentLoaded', function() {
-    const today = new Date();
-    const thirtyYearsAgo = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
-    document.getElementById('birthDate').value = thirtyYearsAgo.toISOString().split('T')[0];
+    // 保存されたデータを読み込む
+    const savedName = localStorage.getItem('last_name');
+    const savedYear = localStorage.getItem('last_year');
+    const savedMonth = localStorage.getItem('last_month');
+    const savedDay = localStorage.getItem('last_day');
+    const savedMaxAge = localStorage.getItem('last_maxAge');
+    
+    if (savedName) {
+        document.getElementById('name').value = savedName;
+    }
+    
+    if (savedYear) {
+        document.getElementById('birthYear').value = savedYear;
+        document.getElementById('birthMonth').value = savedMonth;
+        document.getElementById('birthDay').value = savedDay;
+    } else {
+        // デフォルト値（30年前）
+        const today = new Date();
+        const thirtyYearsAgo = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
+        document.getElementById('birthYear').value = thirtyYearsAgo.getFullYear();
+        document.getElementById('birthMonth').value = thirtyYearsAgo.getMonth() + 1;
+        document.getElementById('birthDay').value = thirtyYearsAgo.getDate();
+    }
+    
+    if (savedMaxAge) {
+        document.getElementById('maxAge').value = savedMaxAge;
+    }
+    
+    // 日付セレクトボックスの生成
+    for (let i = 1; i <= 31; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i + '日';
+        document.getElementById('birthDay').appendChild(option);
+    }
 });
+
+// integrated.html の script 部分に追加
+function goToComparison() {
+    // 現在入力されているデータを保存
+    const name = document.getElementById('name').value;
+    const year = document.getElementById('birthYear').value;
+    const month = document.getElementById('birthMonth').value;
+    const day = document.getElementById('birthDay').value;
+    
+    if (year && month && day) {
+        const birthDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        localStorage.setItem('personA_name', name || '人A');
+        localStorage.setItem('personA_birth', birthDate);
+    }
+    
+    window.location.href = '/compare/';
+}
 </script>
 {% endblock %}

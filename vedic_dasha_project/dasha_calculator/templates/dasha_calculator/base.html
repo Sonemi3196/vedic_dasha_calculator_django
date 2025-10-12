@@ -6,6 +6,45 @@
     <title>{% block title %}ヴェーダ数秘術ツール{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     {% block extra_css %}{% endblock %}
+    <style>
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            
+            .container, .max-w-4xl { padding: 15px; }
+            
+            h1 { font-size: 1.5rem; }
+            
+            button, .nav-button {
+                padding: 12px 20px;
+                font-size: 14px;
+                min-height: 44px; /* タッチしやすいサイズ */
+            }
+            
+            .comparison-table {
+                font-size: 12px;
+            }
+            
+            .comparison-table th,
+            .comparison-table td {
+                padding: 8px 4px;
+            }
+            
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+            
+            nav {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            nav a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100">
     <div class="p-4 md:p-8">
@@ -19,10 +58,21 @@
                     <a href="/" class="px-4 py-2 rounded-lg transition {% block nav_home %}bg-gray-200 hover:bg-gray-300{% endblock %}">
                         総合鑑定
                     </a>
-                    <a href="/compare/" class="px-4 py-2 rounded-lg transition {% block nav_compare %}bg-gray-200 hover:bg-gray-300{% endblock %}">
+                    <a href="#" onclick="goToComparison(); return false;" class="px-4 py-2 rounded-lg transition {% block nav_compare %}bg-gray-200 hover:bg-gray-300{% endblock %}">
                         2人の比較
                     </a>
                 </nav>
+
+                <script>
+                function goToComparison() {
+                    // integrated.html から呼ばれる場合のフォールバック
+                    if (typeof saveAndGoToComparison === 'function') {
+                        saveAndGoToComparison();
+                    } else {
+                        window.location.href = '/compare/';
+                    }
+                }
+                </script>
             </div>
 
             <!-- メインコンテンツ -->

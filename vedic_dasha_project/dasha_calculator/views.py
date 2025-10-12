@@ -50,7 +50,7 @@ def calculate_dasha(request):
         
         # 結果をJSONに変換（最初の30期間のみ）
         result_data = []
-        for i, period in enumerate(periods[:30]):
+        for i, period in enumerate(periods[:150]):
             # 現在の期間かどうかをチェック
             is_current_period = period['start_date'] <= today <= period['end_date']
             
@@ -237,28 +237,36 @@ def hiragana_to_romaji(text):
 @csrf_exempt
 @require_http_methods(["POST"])
 def calculate_integrated(request):
-    """統合計算API"""
     try:
         data = json.loads(request.body)
         name = data.get('name', '')
         birth_date_str = data.get('birth_date', '')
+        max_age = data.get('max_age', 140)  # デフォルト140歳
         
         if not birth_date_str:
             return JsonResponse({'success': False, 'error': '生年月日が必要です'})
         
         birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d').date()
         
-        # ダーシャ計算（既存のロジック使用）
-        calc = DashaCalculation(birth_date=birth_date)
-        dasha_periods = calc.get_dasha_periods()
+        # 必要な期間数を計算（1+2+...+9=45年で1サイクル）
+        max_periods = int(max_age / 45 * 9) + 10  # 余裕を持たせる
         
-        # 現在日付との比較
+        # ダーシャ計算
+        calc = DashaCalculation(birth_date=birth_date)
+        dasha_periods = calc.get_dasha_periods(max_periods=max_periods)
+        
+        # max_age以内のものだけフィルター
         today = datetime.now().date()
         dasha_result = []
-        for i, period in enumerate(dasha_periods[:30]):
+        for period in dasha_periods:
+            if period['start_age'] > max_age:
+                break  # 指定年齢を超えたら終了
+            
             is_current = period['start_date'] <= today <= period['end_date']
             antara_data = []
             for antara in period['antara_dashas']:
+                if antara['start_age'] > max_age:
+                    break
                 is_current_antara = antara['start_date'] <= today <= antara['end_date']
                 antara_data.append({
                     'number': antara['number'],
@@ -270,25 +278,25 @@ def calculate_integrated(request):
                     'is_current': is_current_antara
                 })
             
-            dasha_result.append({
-                'maha_dasha': period['maha_dasha'],
-                'start_date': period['start_date'].strftime('%Y-%m-%d'),
-                'end_date': period['end_date'].strftime('%Y-%m-%d'),
-                'years': period['years'],
-                'start_age': period['start_age'],
-                'end_age': period['end_age'],
-                'antara_dashas': antara_data,
-                'is_current': is_current
-            })
+            if antara_data:  # アンタラダシャがある場合のみ追加
+                dasha_result.append({
+                    'maha_dasha': period['maha_dasha'],
+                    'start_date': period['start_date'].strftime('%Y-%m-%d'),
+                    'end_date': period['end_date'].strftime('%Y-%m-%d'),
+                    'years': period['years'],
+                    'start_age': period['start_age'],
+                    'end_age': period['end_age'],
+                    'antara_dashas': antara_data,
+                    'is_current': is_current
+                })
         
-        # 数秘術計算（名前がある場合のみ）
+        # 数秘術計算（変更なし）
         numerology_result = None
         if name.strip():
             if re.search(r'[ぁ-んァ-ヶ]', name):
                 converted_name = hiragana_to_romaji(name)
             else:
                 converted_name = re.sub(r'[^A-Z]', '', name.upper())
-            
             numerology_result = calculate_numerology_for_name(converted_name, birth_date)
         
         return JsonResponse({
@@ -347,7 +355,28 @@ def calculate_numerology_for_name(name, birth_date):
     all_digits.append(bhagyank['final'])
     if birth_date.day >= 10:
         all_digits.append(moolank['final'])
+
+    # カルマナンバー計算
+    year = birth_date.year
+    month = birth_date.month
+    day = birth_date.day
     
+    # 全ての数字を足す
+    all_sum = sum(int(d) for d in str(year) + str(month) + str(day))
+    
+    # 日付を引く
+    karma_base = all_sum - day
+    
+    # 一桁になるまで計算
+    def reduce_to_single(num):
+        steps = [num]
+        while num >= 10:
+            num = sum(int(d) for d in str(num))
+            steps.append(num)
+        return {'final': num, 'steps': steps}
+    
+    karma_number = reduce_to_single(karma_base)
+
     digit_count = {}
     for digit in all_digits:
         if digit > 0:
@@ -364,5 +393,10 @@ def calculate_numerology_for_name(name, birth_date):
         'name_number': name_number,
         'bhagyank': bhagyank,
         'moolank': moolank,
+        'karma': karma_number,  # 追加
         'grid': grid
     }
+    
+    
+    
+    
