@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django stuff:
+*.log
+staticfiles/
+media/
+
+# Virtual env
+venv/
+.env/

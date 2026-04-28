@@ -1,6 +1,6 @@
 {% extends "dasha_calculator/base.html" %}
 
-{% block title %}ダーシャ比較 - ヴェーダ数秘術{% endblock %}
+{% block title %}ダシャー比較 - ヴェーダ数秘術{% endblock %}
 
 {% block nav_compare %}bg-purple-600 text-white{% endblock %}
 
@@ -18,7 +18,7 @@
     
     .person-input {
         padding: 20px;
-        background: white;
+        background: linear-gradient(to bottom right, #faf5ff, #eff6ff);
         border-radius: 10px;
     }
     
@@ -36,10 +36,15 @@
     input, select {
         width: 100%;
         padding: 12px;
-        border: 2px solid #ddd;
+        border: 2px solid #d8b4fe; /* purple-300 */
         border-radius: 8px;
         font-size: 16px;
         box-sizing: border-box;
+        transition: border-color 0.2s; /* スムーズに変化 */
+    }
+
+    input:focus, select:focus {
+        border-color: #9333ea; /* purple-600 */
     }
     
     button {
@@ -54,6 +59,27 @@
         grid-column: 1 / -1;
         margin-top: 20px;
     }
+
+    .my-button {
+        display: block;
+        margin: 20px auto 0;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: 600;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+
+        background: linear-gradient(to right, #9333ea, #2563eb);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .my-button:hover {
+        background: linear-gradient(to right, #7e22ce, #1d4ed8);
+    }
+
     
     .filter-section {
         background: #f8f9fa;
@@ -284,30 +310,31 @@
 <!-- 入力セクション -->
 <div class="input-section">
     <div class="person-input">
-        <h3 class="text-lg font-bold mb-3">人A</h3>
+        <h3 class="text-lg font-bold mb-3">１人目</h3>
         <div class="form-group">
-            <label for="personAName">名前:</label>
-            <input type="text" id="personAName" value="人A" placeholder="名前を入力" class="w-full">
+            <label for="personAName">なまえ(ひらがな):</label>
+            <input type="text" id="personAName" value="１人目" placeholder="名前を入力" class="flex-1 min-w-0 px-2 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
         </div>
         <div class="form-group">
             <label for="personABirth">生年月日:</label>
-            <input type="date" id="personABirth" required class="w-full">
+            <input type="date" id="personABirth" required class="flex-1 min-w-0 px-2 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
         </div>
     </div>
     
     <div class="person-input">
-        <h3 class="text-lg font-bold mb-3">人B</h3>
+        <h3 class="text-lg font-bold mb-3">２人目</h3>
         <div class="form-group">
-            <label for="personBName">名前:</label>
-            <input type="text" id="personBName" value="人B" placeholder="名前を入力" class="w-full">
+            <label for="personBName">なまえ(ひらがな):</label>
+            <input type="text" id="personBName" value="２人目" placeholder="名前を入力" class="flex-1 min-w-0 px-2 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
         </div>
         <div class="form-group">
             <label for="personBBirth">生年月日:</label>
-            <input type="date" id="personBBirth" required class="w-full">
+            <input type="date" id="personBBirth" required class="flex-1 min-w-0 px-2 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
         </div>
     </div>
     
-    <button onclick="compareAll()">比較開始</button>
+    <button class="my-button" onclick="compareAll()">比較開始</button>
+
 </div>
 
 <!-- 結果表示エリア -->
@@ -316,7 +343,7 @@
     <div class="flex border-b border-gray-300 mb-6">
         <button onclick="switchCompareTab('dasha')" id="tab-dasha" 
             class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-purple-600 text-purple-600">
-            ダーシャ比較
+            ダシャー比較
         </button>
         <button onclick="switchCompareTab('grid')" id="tab-grid" 
             class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-transparent text-gray-500 hover:text-gray-700">
@@ -324,7 +351,7 @@
         </button>
     </div>
 
-    <!-- ダーシャ比較タブ -->
+    <!-- ダシャー比較タブ -->
     <div id="content-dasha" class="tab-content">
         <div id="filterSection" class="filter-section hidden">
             <h3>検索・フィルター</h3>
@@ -338,7 +365,7 @@
                     <input type="number" id="filterAge" placeholder="例: 30">
                 </div>
                 <div class="form-group">
-                    <label for="filterMaha">マハーダーシャ:</label>
+                    <label for="filterMaha">マハーダシャー:</label>
                     <select id="filterMaha">
                         <option value="">全て</option>
                         <option value="1">1</option>
@@ -422,7 +449,7 @@ function compareAll() {
     document.getElementById('resultsContainer').classList.remove('hidden');
     document.getElementById('dashaResults').innerHTML = '<div class="text-center py-8">計算中...</div>';
 
-    // ダーシャ比較データを取得
+    // ダシャー比較データを取得
     fetch('/compare/calculate/', {
         method: 'POST',
         headers: {
@@ -497,7 +524,7 @@ function displayDashaComparison() {
         yearGroups[item.year].push(item);
     });
     
-    let html = '<h2 class="text-xl font-bold mb-4">ダーシャ比較結果</h2>';
+    let html = '<h2 class="text-xl font-bold mb-4">ダシャー比較結果</h2>';
     
     Object.keys(yearGroups).sort((a, b) => a - b).forEach(year => {
         const isCurrentYear = parseInt(year) === currentYear;
@@ -568,8 +595,8 @@ function displayDashaComparison() {
     
     html += `
         <div style="margin-top: 20px; font-size: 14px; color: #666;">
-            <p><span class="maha-number">5</span> = マハーダーシャ番号</p>
-            <p><span class="antara-number">3</span> = アンタラダーシャ番号</p>
+            <p><span class="maha-number">5</span> = マハーダシャー番号</p>
+            <p><span class="antara-number">3</span> = アンタラダシャー番号</p>
         </div>
     `;
     

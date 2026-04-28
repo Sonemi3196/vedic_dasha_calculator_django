@@ -235,12 +235,106 @@ def integrated_view(request):
     return render(request, 'dasha_calculator/integrated.html')
 
 def hiragana_to_romaji(text):
-    """ひらがな→ローマ字変換"""
-    if not HAS_KAKASI:
-        return text.upper()
-    result = kks.convert(text)
-    romaji = ''.join([item['hepburn'].upper() for item in result])
-    return re.sub(r'[^A-Z]', '', romaji)
+    n = text.lower()
+
+    # 拗音
+    youon = {
+        "きゃ": "kya", "きゅ": "kyu", "きょ": "kyo",
+        "しゃ": "sha", "しゅ": "shu", "しょ": "sho",
+        "ちゃ": "cha", "ちゅ": "chu", "ちょ": "cho",
+        "にゃ": "nya", "にゅ": "nyu", "にょ": "nyo",
+        "ひゃ": "hya", "ひゅ": "hyu", "ひょ": "hyo",
+        "みゃ": "mya", "みゅ": "myu", "みょ": "myo",
+        "りゃ": "rya", "りゅ": "ryu", "りょ": "ryo",
+        "ぎゃ": "gya", "ぎゅ": "gyu", "ぎょ": "gyo",
+        "じゃ": "ja",  "じゅ": "ju",  "じょ": "jo",
+    }
+
+    # 基本変換（濁音・半濁音含む）
+    table = {
+        "し": "shi", "ち": "chi", "つ": "tsu", "ふ": "fu",
+        "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
+        "か": "ka", "き": "ki", "く": "ku", "け": "ke", "こ": "ko",
+        "さ": "sa", "す": "su", "せ": "se", "そ": "so",
+        "た": "ta", "て": "te", "と": "to",
+        "な": "na", "に": "ni", "ぬ": "nu", "ね": "ne", "の": "no",
+        "は": "ha", "ひ": "hi", "へ": "he", "ほ": "ho",
+        "ま": "ma", "み": "mi", "む": "mu", "め": "me", "も": "mo",
+        "や": "ya", "ゆ": "yu", "よ": "yo",
+        "ら": "ra", "り": "ri", "る": "ru", "れ": "re", "ろ": "ro",
+        "わ": "wa", "を": "o",
+        "ん": "n",
+        "が": "ga", "ぎ": "gi", "ぐ": "gu", "げ": "ge", "ご": "go",
+        "ざ": "za", "じ": "ji", "ず": "zu", "ぜ": "ze", "ぞ": "zo",
+        "だ": "da", "ぢ": "ji", "づ": "zu", "で": "de", "ど": "do",
+        "ば": "ba", "び": "bi", "ぶ": "bu", "べ": "be", "ぼ": "bo",
+        "ぱ": "pa", "ぴ": "pi", "ぷ": "pu", "ぺ": "pe", "ぽ": "po",
+    }
+
+    result = ""
+    i = 0
+
+    while i < len(n):
+        two = n[i:i+2]
+
+        # ① 拗音（しょ・きょ・ちょ など）
+        if two in youon:
+            result += youon[two]
+            i += 2
+            continue
+
+        # ② ★ 拗音の後の「う」は完全に無視（しょう→sho）
+        if n[i] == "う" and result.endswith((
+            "kya","kyu","kyo",
+            "sha","shu","sho",
+            "cha","chu","cho",
+            "nya","nyu","nyo",
+            "hya","hyu","hyo",
+            "mya","myu","myo",
+            "rya","ryu","ryo",
+            "gya","gyu","gyo",
+            "ja","ju","jo"
+            )):
+            i += 1
+            continue
+
+        # ③ 促音（っ）
+        if n[i] == "っ":
+            if i+1 < len(n) and n[i+1] in table:
+                result += table[n[i+1]][0]
+            i += 1
+            continue
+
+        # ④ 長音（おう → o）
+        if two == "おう":
+            result += "o"
+            i += 2
+            continue
+
+        # ⑤ 長音（おお → o）
+        if two == "おお":
+            result += "o"
+            i += 2
+            continue
+
+        # ⑥ 撥音（ん → M/B/P 前は M）
+        if n[i] == "ん":
+            if i+1 < len(n) and table.get(n[i+1], "").startswith(("b", "m", "p")):
+                result += "m"
+            else:
+                result += "n"
+            i += 1
+            continue
+
+        # ⑦ 通常
+        result += table.get(n[i], "")
+        i += 1
+
+    return result.upper()
+
+
+
+
 
 @csrf_exempt
 @require_http_methods(["POST"])
