@@ -263,34 +263,47 @@
     .btn-back {
         background: linear-gradient(135deg, #6366f1, #4f46e5);
     }
+    /* スマホ対応 */
+    @media (max-width: 768px) {
+        .input-section {
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 15px;
+        }
+        
+        .person-input input {
+            font-size: 16px; /* iOSのズーム防止 */
+        }
+    }
     </style>
 {% endblock %}
 
 {% block content %}
 <h2 class="text-2xl font-bold text-gray-800 mb-4">2人の比較</h2>
 
+<!-- 入力セクション -->
 <div class="input-section">
     <div class="person-input">
-        <h3>人A</h3>
+        <h3 class="text-lg font-bold mb-3">人A</h3>
         <div class="form-group">
             <label for="personAName">名前:</label>
-            <input type="text" id="personAName" value="人A" placeholder="名前を入力">
+            <input type="text" id="personAName" value="人A" placeholder="名前を入力" class="w-full">
         </div>
         <div class="form-group">
             <label for="personABirth">生年月日:</label>
-            <input type="date" id="personABirth" required>
+            <input type="date" id="personABirth" required class="w-full">
         </div>
     </div>
     
     <div class="person-input">
-        <h3>人B</h3>
+        <h3 class="text-lg font-bold mb-3">人B</h3>
         <div class="form-group">
             <label for="personBName">名前:</label>
-            <input type="text" id="personBName" value="人B" placeholder="名前を入力">
+            <input type="text" id="personBName" value="人B" placeholder="名前を入力" class="w-full">
         </div>
         <div class="form-group">
             <label for="personBBirth">生年月日:</label>
-            <input type="date" id="personBBirth" required>
+            <input type="date" id="personBBirth" required class="w-full">
         </div>
     </div>
     

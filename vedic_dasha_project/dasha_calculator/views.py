@@ -99,6 +99,10 @@ def calculate_dasha(request):
             'error': str(e)
         })
     
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+@require_http_methods(["POST"])
 def calculate_comparison(request):
     try:
         data = json.loads(request.body)
@@ -108,31 +112,33 @@ def calculate_comparison(request):
         person_a_name = data.get('person_a_name', '人A')
         person_b_name = data.get('person_b_name', '人B')
         
+        # ダシャー期間を計算
         calc_a = DashaCalculation(birth_date=person_a_birth)
         calc_b = DashaCalculation(birth_date=person_b_birth)
         
-        periods_a = calc_a.get_dasha_periods()
-        periods_b = calc_b.get_dasha_periods()
+        periods_a = calc_a.get_dasha_periods(max_periods=150)
+        periods_b = calc_b.get_dasha_periods(max_periods=150)
         
-        comparison_timeline = create_monthly_comparison(
-            periods_a, periods_b, person_a_birth, person_b_birth
-        )
+        # 月単位の比較タイムラインを作成
+        timeline = create_monthly_comparison(periods_a, periods_b, person_a_birth, person_b_birth)
         
         return JsonResponse({
             'success': True,
             'person_a_name': person_a_name,
             'person_b_name': person_b_name,
-            'timeline': comparison_timeline
+            'timeline': timeline
         })
         
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return JsonResponse({
             'success': False,
             'error': str(e)
         })
 
 def create_monthly_comparison(periods_a, periods_b, birth_a, birth_b):
-    """月単位でダーシャを比較"""
+    """月単位でダシャーを比較"""
     timeline = []
     
     # 開始年と終了年を決定
@@ -143,7 +149,7 @@ def create_monthly_comparison(periods_a, periods_b, birth_a, birth_b):
         for month in range(1, 13):
             first_day = date(year, month, 1)
             
-            # その月の1日時点でのダーシャを取得
+            # その月の1日時点でのダシャーを取得
             dasha_a = find_dasha_for_date(periods_a, first_day, birth_a)
             dasha_b = find_dasha_for_date(periods_b, first_day, birth_b)
             
@@ -163,6 +169,7 @@ def create_monthly_comparison(periods_a, periods_b, birth_a, birth_b):
     return timeline
 
 def find_dasha_for_date(periods, target_date, birth_date):
+    """指定日付のダシャーを検索"""
     if target_date < birth_date:
         return None
         
@@ -218,6 +225,7 @@ def create_transition_comparison(periods_a, periods_b, birth_a, birth_b):
     return timeline
 
 def calculate_age_at_date(birth_date, target_date):
+    """指定日付での年齢を計算"""
     if target_date < birth_date:
         return None
     return (target_date - birth_date).days // 365

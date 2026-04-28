@@ -5,79 +5,58 @@
 {% block nav_home %}bg-purple-600 text-white{% endblock %}
 
 {% block content %}
-<style>
-.date-input-group {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 10px;
-}
-
-.date-input-group input,
-.date-input-group select {
-    padding: 12px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-}
-
-.date-input-group input[type="number"] {
-    -moz-appearance: textfield;
-}
-
-.date-input-group input[type="number"]::-webkit-outer-spin-button,
-.date-input-group input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-</style>
 <div class="space-y-6">
     <!-- 入力フォーム -->
-    <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">鑑定情報の入力</h2>
+    <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-4 md:p-6">
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 text-center">鑑定情報の入力</h2>
         
-        <div class="space-y-4">
+        <div class="space-y-3">
+            <!-- 名前入力を1行に -->
+            
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium text-gray-700 w-12 flex-shrink-0">名前</label>
+                <input type="text" id="name" placeholder="たなか" 
+                    class="flex-1 min-w-0 px-2 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+            </div>
+            
+            <!-- 生年月日入力 -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">名前（任意）</label>
-                <input type="text" id="name" placeholder="例: たなか or Tanaka" 
-                    class="w-full px-4 py-3 text-lg border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
-                <p class="text-xs text-gray-500 mt-1">ひらがな・カタカナ・アルファベットOK（数秘術計算に使用）</p>
+                <label class="block text-sm font-medium text-gray-700 mb-2">生年月日（必須）</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <input type="number" id="birthYear" placeholder="年" min="1900" max="2025"
+                        class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                    <select id="birthMonth" 
+                        class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                        <option value="">月</option>
+                        <option value="1">1月</option>
+                        <option value="2">2月</option>
+                        <option value="3">3月</option>
+                        <option value="4">4月</option>
+                        <option value="5">5月</option>
+                        <option value="6">6月</option>
+                        <option value="7">7月</option>
+                        <option value="8">8月</option>
+                        <option value="9">9月</option>
+                        <option value="10">10月</option>
+                        <option value="11">11月</option>
+                        <option value="12">12月</option>
+                    </select>
+                    <select id="birthDay"
+                        class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                        <option value="">日</option>
+                    </select>
+                </div>
             </div>
             
             <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">生年月日（必須）</label>
-            <div class="date-input-group">
-                <input type="number" id="birthYear" placeholder="年（例: 1989）" min="1900" max="2025" required>
-                <select id="birthMonth" required>
-                    <option value="">月</option>
-                    <option value="1">1月</option>
-                    <option value="2">2月</option>
-                    <option value="3">3月</option>
-                    <option value="4">4月</option>
-                    <option value="5">5月</option>
-                    <option value="6">6月</option>
-                    <option value="7">7月</option>
-                    <option value="8">8月</option>
-                    <option value="9">9月</option>
-                    <option value="10">10月</option>
-                    <option value="11">11月</option>
-                    <option value="12">12月</option>
-                </select>
-                <select id="birthDay" required>
-                    <option value="">日</option>
-                    <!-- 1-31をJavaScriptで生成 -->
-                </select>
-            </div>
-            <!-- 生年月日入力の下に追加 -->
-            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">表示年齢（デフォルト: 140歳）</label>
                 <input type="number" id="maxAge" value="140" min="50" max="200" 
-                    class="w-full px-4 py-3 text-lg border-2 border-purple-300 rounded-lg">
+                    class="w-full px-3 py-2 text-base border-2 border-purple-300 rounded-lg">
             </div>
-</div>
         </div>
         
         <button onclick="calculateAll()" 
-            class="w-full mt-6 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-md">
+            class="w-full mt-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-2.5 rounded-lg transition duration-200 shadow-md text-base">
             鑑定開始
         </button>
     </div>
@@ -86,24 +65,24 @@
     <div id="results" class="hidden">
         <!-- タブ切り替え -->
         <div class="flex border-b border-gray-300 mb-6">
-            <button onclick="switchTab('dasha')" id="tab-dasha" 
-                class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-purple-600 text-purple-600">
-                ダーシャ
-            </button>
             <button onclick="switchTab('numerology')" id="tab-numerology" 
-                class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-purple-600 text-purple-600">
                 数秘術
             </button>
-        </div>
-
-        <!-- ダーシャタブ -->
-        <div id="content-dasha" class="tab-content">
-            <div id="dashaResults"></div>
+            <button onclick="switchTab('dasha')" id="tab-dasha" 
+                class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                ダシャー
+            </button>
         </div>
 
         <!-- 数秘術タブ -->
-        <div id="content-numerology" class="tab-content hidden">
+        <div id="content-numerology" class="tab-content">
             <div id="numerologyResults"></div>
+        </div>
+
+        <!-- ダシャータブ -->
+        <div id="content-dasha" class="tab-content hidden">
+            <div id="dashaResults"></div>
         </div>
     </div>
 </div>
@@ -113,82 +92,35 @@
 <script>
 let currentData = null;
 
-// 日付のセレクトボックスを生成
-for (let i = 1; i <= 31; i++) {
-    const option = document.createElement('option');
-    option.value = i;
-    option.textContent = i + '日';
-    document.getElementById('birthDay').appendChild(option);
-}
-
-// 比較ページ用の日付生成も同様に
-if (document.getElementById('personABirthDay')) {
-    for (let i = 1; i <= 31; i++) {
-        const option1 = document.createElement('option');
-        option1.value = i;
-        option1.textContent = i + '日';
-        document.getElementById('personABirthDay').appendChild(option1);
-        
-        const option2 = document.createElement('option');
-        option2.value = i;
-        option2.textContent = i + '日';
-        document.getElementById('personBBirthDay').appendChild(option2);
-    }
-}
-
-function goToComparison() {
-    // 現在入力されているデータを取得
-    const name = document.getElementById('name').value;
-    const birthDate = getBirthDate();
-    
-    if (birthDate) {
-        // LocalStorageに保存
-        localStorage.setItem('personA_name', name || '人A');
-        localStorage.setItem('personA_birth', birthDate);
-    }
-    
-    window.location.href = '/compare/';
-}
-
-// 生年月日を取得する関数（既存の birthDate 取得部分を置き換え）
 function getBirthDate() {
     const year = document.getElementById('birthYear').value;
     const month = document.getElementById('birthMonth').value;
     const day = document.getElementById('birthDay').value;
     
-    if (!year || !month || !day) {
-        return null;
-    }
+    if (!year || !month || !day) return null;
     
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 }
 
-
-
 function calculateAll() {
     const name = document.getElementById('name').value;
-    const birthYear = document.getElementById('birthYear').value;
-    const birthMonth = document.getElementById('birthMonth').value;
-    const birthDay = document.getElementById('birthDay').value;
+    const birthDate = getBirthDate();
     const maxAge = parseInt(document.getElementById('maxAge').value) || 140;
     
-    // LocalStorageに保存
-    localStorage.setItem('last_name', name);
-    localStorage.setItem('last_year', birthYear);
-    localStorage.setItem('last_month', birthMonth);
-    localStorage.setItem('last_day', birthDay);
-    localStorage.setItem('last_maxAge', maxAge);
-    
-    // 生年月日の組み立て
-    if (!birthYear || !birthMonth || !birthDay) {
+    if (!birthDate) {
         alert('生年月日を全て入力してください');
         return;
     }
     
-    const birthDate = `${birthYear}-${birthMonth.padStart(2, '0')}-${birthDay.padStart(2, '0')}`;
+    // LocalStorageに保存
+    localStorage.setItem('last_name', name);
+    localStorage.setItem('last_year', document.getElementById('birthYear').value);
+    localStorage.setItem('last_month', document.getElementById('birthMonth').value);
+    localStorage.setItem('last_day', document.getElementById('birthDay').value);
+    localStorage.setItem('last_maxAge', maxAge);
     
     document.getElementById('results').classList.remove('hidden');
-    document.getElementById('dashaResults').innerHTML = '<div class="text-center py-8">計算中...</div>';
+    document.getElementById('numerologyResults').innerHTML = '<div class="text-center py-8">計算中...</div>';
     
     fetch('/calculate/', {
         method: 'POST',
@@ -196,20 +128,20 @@ function calculateAll() {
         body: JSON.stringify({ 
             name: name, 
             birth_date: birthDate,
-            max_age: maxAge  // 追加
+            max_age: maxAge
         })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             currentData = data;
-            displayDasha(data.dasha);
             if (data.numerology) {
                 displayNumerology(data.numerology);
             } else {
                 document.getElementById('numerologyResults').innerHTML = 
                     '<div class="text-center py-8 text-gray-500">名前を入力すると数秘術結果が表示されます</div>';
             }
+            displayDasha(data.dasha);
         } else {
             alert('エラー: ' + data.error);
         }
@@ -233,11 +165,21 @@ function switchTab(tabName) {
         content.classList.add('hidden');
     });
     document.getElementById('content-' + tabName).classList.remove('hidden');
+    
+    // ダシャータブに切り替えた時、現在のダシャーまでスクロール
+    if (tabName === 'dasha') {
+        setTimeout(() => {
+            const currentElement = document.querySelector('.border-red-500');
+            if (currentElement) {
+                currentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
+    }
 }
 
 function displayDasha(dashaData) {
     const html = `
-        <h3 class="text-xl font-bold text-gray-800 mb-4">ダーシャ（開始番号: ${dashaData.start_number}）</h3>
+        <h3 class="text-xl font-bold text-gray-800 mb-4">ダシャー（開始番号: ${dashaData.start_number}）</h3>
         <div class="space-y-4">
             ${dashaData.periods.map(period => `
                 <div class="border-2 ${period.is_current ? 'border-red-500 bg-red-50' : 'border-gray-200'} rounded-lg overflow-hidden">
@@ -245,7 +187,7 @@ function displayDasha(dashaData) {
                         <div class="flex justify-between items-center">
                             <div>
                                 <span class="text-3xl font-bold">${period.maha_dasha}</span>
-                                <span class="ml-3">マハーダーシャ ${period.maha_dasha} (${period.years}年間)</span>
+                                <span class="ml-3">マハーダシャー ${period.maha_dasha} (${period.years}年間)</span>
                             </div>
                             <div class="text-right text-sm">
                                 <div>${period.start_date} 〜 ${period.end_date}</div>
@@ -258,7 +200,7 @@ function displayDasha(dashaData) {
                             <div class="flex justify-between items-center p-3 rounded ${antara.is_current ? 'bg-red-100 border-2 border-red-400' : 'bg-gray-50'}">
                                 <div>
                                     <span class="inline-block w-8 h-8 bg-green-500 text-white rounded-full text-center leading-8 font-bold mr-2">${antara.number}</span>
-                                    <span class="font-medium">アンタラダーシャ ${antara.number} (${antara.days}日間)</span>
+                                    <span class="font-medium">アンタラダシャー ${antara.number} (${antara.days}日間)</span>
                                 </div>
                                 <div class="text-sm text-gray-600">
                                     ${antara.start_date} 〜 ${antara.end_date} (${antara.start_age}歳〜${antara.end_age}歳)
@@ -317,34 +259,33 @@ function displayNumerology(numData) {
                 </div>
             </div>
 
-            <!-- 4つの番号（カルマ追加） -->
+            <!-- 4つの番号 -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="p-6 rounded-lg text-center ${numberColors[numData.bhagyank.final]}">
-                    <h4 class="font-bold mb-2">バーギャング</h4>
-                    <p class="text-xs mb-3 opacity-80">人生全体の運命</p>
-                    <div class="text-5xl font-bold mb-3">${numData.bhagyank.final}</div>
-                    <p class="text-xs">${meanings[numData.bhagyank.final]}</p>
+                <div class="p-4 md:p-6 rounded-lg text-center ${numberColors[numData.bhagyank.final]}">
+                    <h4 class="text-sm font-bold mb-2">バーギャング</h4>
+                    <p class="text-xs mb-2 opacity-80">人生全体の運命</p>
+                    <div class="text-4xl md:text-5xl font-bold mb-2">${numData.bhagyank.final}</div>
+                    <p class="text-xs leading-relaxed">${meanings[numData.bhagyank.final]}</p>
                 </div>
-                <div class="p-6 rounded-lg text-center ${numberColors[numData.moolank.final]}">
-                    <h4 class="font-bold mb-2">ムーランク</h4>
-                    <p class="text-xs mb-3 opacity-80">基本的な性格</p>
-                    <div class="text-5xl font-bold mb-3">${numData.moolank.final}</div>
-                    <p class="text-xs">${meanings[numData.moolank.final]}</p>
+                <div class="p-4 md:p-6 rounded-lg text-center ${numberColors[numData.moolank.final]}">
+                    <h4 class="text-sm font-bold mb-2">ムーランク</h4>
+                    <p class="text-xs mb-2 opacity-80">基本的な性格</p>
+                    <div class="text-4xl md:text-5xl font-bold mb-2">${numData.moolank.final}</div>
+                    <p class="text-xs leading-relaxed">${meanings[numData.moolank.final]}</p>
                 </div>
-                <div class="p-6 rounded-lg text-center ${numberColors[numData.name_number.final]}">
-                    <h4 class="font-bold mb-2">名前番号</h4>
-                    <p class="text-xs mb-3 opacity-80">才能と成長方向</p>
-                    <div class="text-5xl font-bold mb-3">${numData.name_number.final}</div>
-                    <p class="text-xs">${meanings[numData.name_number.final]}</p>
+                <div class="p-4 md:p-6 rounded-lg text-center ${numberColors[numData.name_number.final]}">
+                    <h4 class="text-sm font-bold mb-2">名前番号</h4>
+                    <p class="text-xs mb-2 opacity-80">才能と成長方向</p>
+                    <div class="text-4xl md:text-5xl font-bold mb-2">${numData.name_number.final}</div>
+                    <p class="text-xs leading-relaxed">${meanings[numData.name_number.final]}</p>
                 </div>
-                <div class="p-6 rounded-lg text-center ${numberColors[numData.karma.final]}">
-                    <h4 class="font-bold mb-2">カルマ</h4>
-                    <p class="text-xs mb-3 opacity-80">過去世からの課題</p>
-                    <div class="text-5xl font-bold mb-3">${numData.karma.final}</div>
-                    <p class="text-xs">${meanings[numData.karma.final]}</p>
+                <div class="p-4 md:p-6 rounded-lg text-center ${numberColors[numData.karma.final]}">
+                    <h4 class="text-sm font-bold mb-2">カルマ</h4>
+                    <p class="text-xs mb-2 opacity-80">過去世からの課題</p>
+                    <div class="text-4xl md:text-5xl font-bold mb-2">${numData.karma.final}</div>
+                    <p class="text-xs leading-relaxed">${meanings[numData.karma.final]}</p>
                 </div>
             </div>
-            
 
             <!-- 文字の内訳 -->
             <div class="bg-purple-50 rounded-lg p-6">
@@ -366,6 +307,15 @@ function displayNumerology(numData) {
 
 // 初期値設定
 document.addEventListener('DOMContentLoaded', function() {
+    // 日セレクトボックスの生成
+    const daySelect = document.getElementById('birthDay');
+    for (let i = 1; i <= 31; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i + '日';
+        daySelect.appendChild(option);
+    }
+    
     // 保存されたデータを読み込む
     const savedName = localStorage.getItem('last_name');
     const savedYear = localStorage.getItem('last_year');
@@ -393,26 +343,13 @@ document.addEventListener('DOMContentLoaded', function() {
     if (savedMaxAge) {
         document.getElementById('maxAge').value = savedMaxAge;
     }
-    
-    // 日付セレクトボックスの生成
-    for (let i = 1; i <= 31; i++) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = i + '日';
-        document.getElementById('birthDay').appendChild(option);
-    }
 });
 
-// integrated.html の script 部分に追加
 function goToComparison() {
-    // 現在入力されているデータを保存
     const name = document.getElementById('name').value;
-    const year = document.getElementById('birthYear').value;
-    const month = document.getElementById('birthMonth').value;
-    const day = document.getElementById('birthDay').value;
+    const birthDate = getBirthDate();
     
-    if (year && month && day) {
-        const birthDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    if (birthDate) {
         localStorage.setItem('personA_name', name || '人A');
         localStorage.setItem('personA_birth', birthDate);
     }
