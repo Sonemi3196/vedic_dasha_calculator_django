@@ -341,14 +341,27 @@
 <div id="resultsContainer" class="hidden">
     <!-- タブ切り替え（総合鑑定と同じスタイル） -->
     <div class="flex border-b border-gray-300 mb-6">
-        <button onclick="switchCompareTab('dasha')" id="tab-dasha" 
-            class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-purple-600 text-purple-600">
-            ダシャー比較
-        </button>
         <button onclick="switchCompareTab('grid')" id="tab-grid" 
-            class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+            class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-purple-600 text-purple-600">
             グリッド比較
         </button>
+        <button onclick="switchCompareTab('dasha')" id="tab-dasha" 
+            class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+            ダシャー比較
+        </button>
+    </div>
+
+    <!-- グリッド比較タブ -->
+    <div id="content-grid" class="tab-content">
+        <div id="gridResults"></div>
+    </div>
+
+    <!-- ダシャー比較タブ -->
+    <div id="content-dasha" class="tab-content hidden">
+        <div id="filterSection" class="filter-section hidden">
+            <!-- フィルターの内容は同じ -->
+        </div>
+        <div id="dashaResults"></div>
     </div>
 
     <!-- ダシャー比較タブ -->
@@ -433,6 +446,24 @@ function switchCompareTab(tabName) {
         content.classList.add('hidden');
     });
     document.getElementById('content-' + tabName).classList.remove('hidden');
+    
+    // ダシャータブに切り替えた時、現在のダシャーまでスクロール
+    if (tabName === 'dasha') {
+        setTimeout(() => {
+            const currentYear = new Date().getFullYear();
+            const currentYearHeader = Array.from(document.querySelectorAll('.year-header'))
+                .find(h => h.textContent.includes(`${currentYear}年`));
+            
+            if (currentYearHeader) {
+                // 現在の年を展開
+                currentYearHeader.classList.remove('collapsed');
+                currentYearHeader.nextElementSibling.classList.remove('collapsed');
+                
+                // スクロール
+                currentYearHeader.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
+    }
 }
 
 function compareAll() {
@@ -601,6 +632,18 @@ function displayDashaComparison() {
     `;
     
     resultsDiv.innerHTML = html;
+    
+    // 表示後、現在の年までスクロール（ダシャータブが表示されている場合のみ）
+    if (!document.getElementById('content-dasha').classList.contains('hidden')) {
+        setTimeout(() => {
+            const currentYearHeader = Array.from(document.querySelectorAll('.year-header'))
+                .find(h => h.textContent.includes(`${currentYear}年`));
+            
+            if (currentYearHeader) {
+                currentYearHeader.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
+    }
 }
 
 function displayGridComparison() {
