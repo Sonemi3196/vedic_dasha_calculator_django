@@ -499,6 +499,12 @@ def calculate_numerology_for_name(name, birth_date):
         'grid': grid
     }
     
-    
+def prashna_view(request):
+    """プラシュナ数秘術ページ"""
+    return render(request, 'dasha_calculator/prashna.html')
+
+def dice_view(request):
+    """ダイス数秘術ページ"""
+    return render(request, 'dasha_calculator/dice.html')
     
     

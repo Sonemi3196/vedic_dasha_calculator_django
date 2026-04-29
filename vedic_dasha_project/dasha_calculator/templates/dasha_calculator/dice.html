@@ -1,0 +1,355 @@
+{% extends "dasha_calculator/base.html" %}
+
+{% block title %}ダイス数秘術 - ヴェーダ数秘術{% endblock %}
+
+{% block nav_dice %}bg-purple-600 text-white{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- 入力フォーム -->
+    <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-4 md:p-6">
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 text-center">ダイス数秘術</h2>
+        
+        <div class="space-y-4">
+            <!-- 占い方法選択 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">占い方法</label>
+                <select id="diceMethod" onchange="changeDiceMethod()"
+                    class="w-full px-3 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                    <option value="1">1回振る</option>
+                    <option value="3">3回振る（グリッド使用）</option>
+                    <option value="5">5回振る（グリッド使用）</option>
+                </select>
+            </div>
+            
+            <!-- ダイスタイプ選択 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">ダイスタイプ</label>
+                <div class="flex gap-3">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="diceType" value="virtual" checked class="mr-2">
+                        <span>電子ダイス</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="diceType" value="manual" class="mr-2">
+                        <span>手動入力</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- グリッド用生年月日（3回・5回の場合のみ表示） -->
+            <div id="gridDateSection" class="hidden">
+                <label class="block text-sm font-medium text-gray-700 mb-2">生年月日（グリッド用）</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <input type="number" id="diceYear" placeholder="年" min="1900" max="2025"
+                        class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg">
+                    <select id="diceMonth" class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg">
+                        <option value="">月</option>
+                        <option value="1">1月</option>
+                        <option value="2">2月</option>
+                        <option value="3">3月</option>
+                        <option value="4">4月</option>
+                        <option value="5">5月</option>
+                        <option value="6">6月</option>
+                        <option value="7">7月</option>
+                        <option value="8">8月</option>
+                        <option value="9">9月</option>
+                        <option value="10">10月</option>
+                        <option value="11">11月</option>
+                        <option value="12">12月</option>
+                    </select>
+                    <select id="diceDay" class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg">
+                        <option value="">日</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="startDice()" 
+            class="w-full mt-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-2.5 rounded-lg transition duration-200 shadow-md text-base">
+            鑑定開始
+        </button>
+    </div>
+
+    <!-- 結果表示エリア -->
+    <div id="diceResults"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let diceRolls = [];
+let baseGrid = null;
+let maxRolls = 1;
+
+function changeDiceMethod() {
+    const method = document.getElementById('diceMethod').value;
+    const gridSection = document.getElementById('gridDateSection');
+    
+    if (method === '1') {
+        gridSection.classList.add('hidden');
+        maxRolls = 1;
+    } else {
+        gridSection.classList.remove('hidden');
+        maxRolls = parseInt(method);
+    }
+}
+
+function startDice() {
+    const method = parseInt(document.getElementById('diceMethod').value);
+    maxRolls = method;
+    diceRolls = [];
+    
+    // グリッド使用の場合、生年月日からグリッドを作成
+    if (method > 1) {
+        const year = document.getElementById('diceYear').value;
+        const month = document.getElementById('diceMonth').value;
+        const day = document.getElementById('diceDay').value;
+        
+        if (!year || !month || !day) {
+            // LocalStorageから取得を試みる
+            const savedYear = localStorage.getItem('last_year');
+            const savedMonth = localStorage.getItem('last_month');
+            const savedDay = localStorage.getItem('last_day');
+            
+            if (savedYear && savedMonth && savedDay) {
+                document.getElementById('diceYear').value = savedYear;
+                document.getElementById('diceMonth').value = savedMonth;
+                document.getElementById('diceDay').value = savedDay;
+                baseGrid = calculateBaseGrid(savedYear, savedMonth, savedDay);
+            } else {
+                alert('生年月日を入力してください');
+                return;
+            }
+        } else {
+            baseGrid = calculateBaseGrid(year, month, day);
+        }
+    }
+    
+    showDiceRoller();
+}
+
+function calculateBaseGrid(year, month, day) {
+    // 簡易的なグリッド計算（views.pyの計算ロジックと同じ）
+    const grid = {};
+    for (let i = 1; i <= 9; i++) {
+        grid[i] = '';
+    }
+    
+    const yearLast = year % 100;
+    const allDigits = [];
+    allDigits.push(...String(yearLast).split('').map(Number));
+    allDigits.push(...String(month).split('').map(Number));
+    allDigits.push(...String(day).split('').map(Number));
+    
+    
+    // YYYYMMDD を作る（ゼロ埋め）
+    const y4 = String(year).padStart(4, '0');
+    const m2 = String(month).padStart(2, '0');
+    const d2 = String(day).padStart(2, '0');
+
+    // digits = YYYYMMDD の各桁
+    const digitsForBhagyank = (y4 + m2 + d2).split('').map(Number);
+
+    // 合計
+    let bhagyank = digitsForBhagyank.reduce((a, b) => a + b, 0);
+
+    // reduce_to_single と同じ処理
+    while (bhagyank >= 10) {
+        bhagyank = String(bhagyank)
+            .split('')
+            .map(Number)
+            .reduce((a, b) => a + b, 0);
+    }
+
+    // allDigits に追加
+    allDigits.push(bhagyank);
+        
+    // ムーランク
+    if (day >= 10) {
+        let moolank = day;
+        while (moolank >= 10) {
+            moolank = String(moolank).split('').map(Number).reduce((a, b) => a + b, 0);
+        }
+        allDigits.push(moolank);
+    }
+    
+    allDigits.forEach(d => {
+        if (d > 0 && d <= 9) {
+            grid[d] += String(d);
+        }
+    });
+    
+    return grid;
+}
+
+function showDiceRoller() {
+    const diceType = document.querySelector('input[name="diceType"]:checked').value;
+    
+    let html = `
+        <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-center mb-4">
+                ${diceRolls.length + 1}回目（${maxRolls}回中）
+            </h3>
+    `;
+    
+    if (diceType === 'virtual') {
+        html += `
+            <div class="text-center">
+                <button onclick="rollVirtualDice()" 
+                    class="bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold py-4 px-8 rounded-lg text-xl hover:from-green-600 hover:to-blue-600 transition">
+                    🎲 ダイスを振る
+                </button>
+            </div>
+        `;
+    } else {
+        html += `
+            <div class="text-center">
+                <label class="block mb-2 font-semibold">ダイスの結果を入力（1-9）</label>
+                <input type="number" id="manualDiceInput" min="1" max="9" 
+                    class="w-32 px-4 py-2 text-2xl text-center border-2 border-purple-300 rounded-lg mb-3">
+                <button onclick="submitManualDice()" 
+                    class="block mx-auto bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:from-purple-700 hover:to-blue-700 transition">
+                    確定
+                </button>
+            </div>
+        `;
+    }
+    
+    html += `</div>`;
+    
+    document.getElementById('diceResults').innerHTML = html;
+}
+
+function rollVirtualDice() {
+    const result = Math.floor(Math.random() * 9) + 1;
+    diceRolls.push(result);
+    
+    if (diceRolls.length < maxRolls) {
+        showDiceRoller();
+    } else {
+        showFinalResults();
+    }
+}
+
+function submitManualDice() {
+    const input = document.getElementById('manualDiceInput').value;
+    const num = parseInt(input);
+    
+    if (num >= 1 && num <= 9) {
+        diceRolls.push(num);
+        
+        if (diceRolls.length < maxRolls) {
+            showDiceRoller();
+        } else {
+            showFinalResults();
+        }
+    } else {
+        alert('1から9の数字を入力してください');
+    }
+}
+
+function showFinalResults() {
+    const meanings = {
+        1: '自我、自信、エゴ、プライド、地位、名誉、権力、バイタリティ',
+        2: '心、精神、変化、豊かさ、日常、家庭生活、内面',
+        3: '知恵、知識、道徳、幸運、修行、英知、拡大、発展、マントラ、先生',
+        4: '外交的、貪欲、中毒、快楽主義、物質主義',
+        5: '知識、学び、言葉、コミュニケーション、思考、星占術',
+        6: '恋愛、結婚、芸術、生物、音楽、文化、贅沢',
+        7: '内向的、純粋、無欲、禁欲主義、直感、オカルト',
+        8: '試練、努力、苦悩、障害、奉仕、農業、改革、奴隷',
+        9: '情熱、行動、集中力、欲望、怒り、短期、火、闘争、衝動'
+    };
+    
+    let html = `
+        <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-center mb-4">鑑定結果</h3>
+    `;
+    
+    if (maxRolls === 1) {
+        // 1回振りの場合
+        html += `
+            <div class="bg-white rounded-lg p-6 text-center border-2 border-purple-500">
+                <div class="text-7xl mb-4">🎲</div>
+                <div class="text-6xl font-bold text-purple-600 mb-3">${diceRolls[0]}</div>
+                <p class="text-gray-700 text-lg">${meanings[diceRolls[0]]}</p>
+            </div>
+        `;
+    } else {
+        // 3回・5回振りの場合（グリッド表示）
+        const updatedGrid = {...baseGrid};
+        diceRolls.forEach(num => {
+            updatedGrid[num] += String(num);
+        });
+        
+        html += `
+            <div class="mb-6">
+                <h4 class="font-bold text-center mb-3">振った結果</h4>
+                <div class="flex justify-center gap-3">
+                    ${diceRolls.map(num => `
+                        <div class="w-16 h-16 bg-white border-2 border-purple-500 rounded-lg flex items-center justify-center text-3xl font-bold">
+                            ${num}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg p-6">
+                <h4 class="font-bold text-center mb-3">グリッド（ダイス追加後）</h4>
+                <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto mb-4">
+                    ${[3,1,9,6,7,5,2,8,4].map(n => {
+                        const baseCount = (baseGrid[n] || '').length;
+                        const totalCount = (updatedGrid[n] || '').length;
+                        const addedCount = totalCount - baseCount;
+                        
+                        return `<div class="aspect-square bg-white border-2 border-purple-300 rounded-lg flex flex-col items-center justify-center p-2">
+                            <div class="text-3xl font-bold ${addedCount > 0 ? 'text-green-600' : 'text-purple-600'}">
+                                ${updatedGrid[n] || ''}
+                            </div>
+                            ${addedCount > 0 ? `<div class="text-xs text-green-600 mt-1">+${addedCount}</div>` : ''}
+                        </div>`;
+                    }).join('')}
+                </div>
+                <p class="text-xs text-center text-gray-600">
+                    <span class="text-green-600 font-bold">緑色</span> = ダイスで追加された数字
+                </p>
+            </div>
+        `;
+    }
+    
+    html += `
+            <button onclick="startDice()" 
+                class="w-full mt-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-2.5 rounded-lg hover:from-purple-700 hover:to-blue-700 transition">
+                もう一度占う
+            </button>
+        </div>
+    `;
+    
+    document.getElementById('diceResults').innerHTML = html;
+}
+
+// 初期値設定
+document.addEventListener('DOMContentLoaded', function() {
+    // 日のセレクトボックス生成
+    const daySelect = document.getElementById('diceDay');
+    for (let i = 1; i <= 31; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i + '日';
+        daySelect.appendChild(option);
+    }
+    
+    // LocalStorageから生年月日を読み込み
+    const savedYear = localStorage.getItem('last_year');
+    const savedMonth = localStorage.getItem('last_month');
+    const savedDay = localStorage.getItem('last_day');
+    
+    if (savedYear) {
+        document.getElementById('diceYear').value = savedYear;
+        document.getElementById('diceMonth').value = savedMonth;
+        document.getElementById('diceDay').value = savedDay;
+    }
+});
+</script>
+{% endblock %}

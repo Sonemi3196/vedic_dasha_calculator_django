@@ -54,13 +54,19 @@
                 <h1 class="text-3xl font-bold text-center text-gray-800 mb-4">ヴェーダ数秘術<br class="md:hidden">総合ツール</h1>
                 
                 <!-- ナビゲーションタブ -->
-                <nav class="flex justify-center gap-2 mb-4">
+                <nav class="flex justify-center gap-2 mb-4 flex-wrap">
                     <a href="/" class="px-4 py-2 rounded-lg transition {% block nav_home %}bg-gray-200 hover:bg-gray-300{% endblock %}">
                         総合鑑定
                     </a>
-                    <a href="#" onclick="goToComparison(); return false;" class="px-4 py-2 rounded-lg transition {% block nav_compare %}bg-gray-200 hover:bg-gray-300{% endblock %}">
+                    <a href="/compare/" class="px-4 py-2 rounded-lg transition {% block nav_compare %}bg-gray-200 hover:bg-gray-300{% endblock %}">
                         2人の比較
                     </a>
+                    <a href="/prashna/" class="px-4 py-2 rounded-lg transition {% block nav_prashna %}bg-gray-200 hover:bg-gray-300{% endblock %}">
+                        プラシュナ
+                    </a>
+                    <a href="/dice/" class="px-4 py-2 rounded-lg transition {% block nav_dice %}bg-gray-200 hover:bg-gray-300{% endblock %}">
+                        ダイス
+                    </a>                    
                 </nav>
 
                 <script>

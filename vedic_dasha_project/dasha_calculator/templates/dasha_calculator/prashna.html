@@ -1,0 +1,262 @@
+{% extends "dasha_calculator/base.html" %}
+
+{% block title %}プラシュナ数秘術 - ヴェーダ数秘術{% endblock %}
+
+{% block nav_prashna %}bg-purple-600 text-white{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- 入力フォーム -->
+    <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-4 md:p-6">
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 text-center">プラシュナ数秘術</h2>
+        <p class="text-sm text-gray-600 text-center mb-4">時刻から数字のピラミッドを作成し、運勢を占います</p>
+        
+        <div class="space-y-3">
+            <!-- 年 -->
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-medium text-gray-700 w-12 flex-shrink-0">年</label>
+                <input type="number" id="prashnaYear" min="1900" max="2100" placeholder="2026"
+                    class="flex-1 min-w-0 px-2 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+            </div>
+            
+            <!-- 月日 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">月日</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="prashnaMonth" 
+                        class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                        <option value="">月</option>
+                        <option value="1">1月</option>
+                        <option value="2">2月</option>
+                        <option value="3">3月</option>
+                        <option value="4">4月</option>
+                        <option value="5">5月</option>
+                        <option value="6">6月</option>
+                        <option value="7">7月</option>
+                        <option value="8">8月</option>
+                        <option value="9">9月</option>
+                        <option value="10">10月</option>
+                        <option value="11">11月</option>
+                        <option value="12">12月</option>
+                    </select>
+                    <select id="prashnaDay"
+                        class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                        <option value="">日</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 時刻 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">時刻</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="prashnaHour"
+                        class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                        <option value="">時</option>
+                    </select>
+                    <select id="prashnaMinute"
+                        class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                        <option value="">分</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="calculatePrashna()" 
+            class="w-full mt-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-2.5 rounded-lg transition duration-200 shadow-md text-base">
+            ピラミッド作成
+        </button>
+    </div>
+
+    <!-- 結果表示エリア -->
+    <div id="prashnaResults"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function calculatePrashna() {
+    const year = document.getElementById('prashnaYear').value;
+    const month = document.getElementById('prashnaMonth').value;
+    const day = document.getElementById('prashnaDay').value;
+    const hour = document.getElementById('prashnaHour').value;
+    const minute = document.getElementById('prashnaMinute').value;
+    
+    if (!year || !month || !day || !hour || !minute) {
+        alert('全ての項目を入力してください');
+        return;
+    }
+    
+    // 数字列を作成（例: 20260429）
+    const numberString = year + month.padStart(2, '0') + day.padStart(2, '0')+hour.padStart(2, '0')+minute.padStart(2, '0');
+    
+    // ピラミッドを計算
+    const pyramid = buildPyramid(numberString);
+    
+    // 各数字の出現回数をカウント
+    const frequency = {};
+    pyramid.forEach(row => {
+        row.forEach(item => {
+            const num = item.value;
+            if (num !== null) {
+                frequency[num] = (frequency[num] || 0) + 1;
+            }
+        });
+    });
+    
+    displayPrashnaResults(pyramid, frequency, numberString, hour, minute);
+}
+
+function buildPyramid(numStr) {
+    let pyramid = [];
+    
+    // 最初の行
+    let firstRow = numStr.split('').map(d => ({
+        value: parseInt(d),
+        isTwoDigit: false
+    }));
+    pyramid.push(firstRow);
+    
+    // ピラミッドを構築
+    while (pyramid[pyramid.length - 1].length > 1) {
+        let lastRow = pyramid[pyramid.length - 1];
+        let newRow = [];
+        
+        for (let i = 0; i < lastRow.length - 1; i++) {
+            let sum = lastRow[i].value + lastRow[i + 1].value;
+            let isTwoDigit = false;
+            
+            // 2桁になった場合は更に計算
+            if (sum >= 10) {
+                isTwoDigit = true;
+                sum = Math.floor(sum / 10) + (sum % 10);
+            }
+            
+            newRow.push({
+                value: sum,
+                isTwoDigit: isTwoDigit
+            });
+        }
+        
+        pyramid.push(newRow);
+    }
+    
+    return pyramid;
+}
+
+function displayPrashnaResults(pyramid, frequency, dateStr, hour, minute) {
+    const finalNumber = pyramid[pyramid.length - 1][0].value;
+    
+    const meanings = {
+        1: '自我、自信、エゴ、プライド、地位、名誉、権力、バイタリティ',
+        2: '心、精神、変化、豊かさ、日常、家庭生活、内面',
+        3: '知恵、知識、道徳、幸運、修行、英知、拡大、発展、マントラ、先生',
+        4: '外交的、貪欲、中毒、快楽主義、物質主義',
+        5: '知識、学び、言葉、コミュニケーション、思考、星占術',
+        6: '恋愛、結婚、芸術、生物、音楽、文化、贅沢',
+        7: '内向的、純粋、無欲、禁欲主義、直感、オカルト',
+        8: '試練、努力、苦悩、障害、奉仕、農業、改革、奴隷',
+        9: '情熱、行動、集中力、欲望、怒り、短期、火、闘争、衝動'
+    };
+    
+    // 頻度順にソート
+    const sortedFreq = Object.entries(frequency).sort((a, b) => b[1] - a[1]);
+    
+    let html = `
+        <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-center mb-4">
+                ${dateStr.slice(0,4)}年${dateStr.slice(4,6)}月${dateStr.slice(6,8)}日 ${hour}:${minute}
+            </h3>
+            
+            <!-- 数字ピラミッド -->
+            <div class="mb-6">
+                <h4 class="font-bold text-center mb-3">数字ピラミッド</h4>
+                <div class="flex flex-col items-center gap-y-1 sm:gap-y-2">
+                    ${pyramid.map((row, rowIdx) => `
+                        <div class="flex gap-1 sm:gap-2 scale-75 sm:scale-100">
+                            ${row.map(item => `
+                                <div class="w-6 h-6 sm:w-10 sm:h-10 flex items-center justify-center rounded ${
+                                    item.isTwoDigit ? 'bg-yellow-200 border-2 border-yellow-400' : 'bg-white border-2 border-purple-300'
+                                } font-bold text-lg">
+                                    ${item.value}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+                <p class="text-xs text-center mt-2 text-gray-600">
+                    <span class="inline-block w-4 h-4 bg-yellow-200 border border-yellow-400 mr-1"></span>
+                    黄色 = 2桁になった数字
+                </p>
+            </div>
+            
+            <!-- 最終結果 -->
+            <div class="bg-white rounded-lg p-6 mb-4 text-center border-2 border-purple-500">
+                <h4 class="font-bold mb-2">最終結果</h4>
+                <div class="text-6xl font-bold text-purple-600 mb-3">${finalNumber}</div>
+                <p class="text-gray-700">${meanings[finalNumber]}</p>
+            </div>
+            
+            <!-- 数字の出現頻度 -->
+            <div class="bg-white rounded-lg p-6">
+                <h4 class="font-bold mb-3 text-center">数字の出現頻度</h4>
+                <div class="grid grid-cols-2 gap-3">
+                    ${sortedFreq.map(([num, count]) => `
+                        <div class="border-2 border-purple-300 rounded-lg p-3 text-center">
+                            <div class="text-3xl font-bold text-purple-600">${num}</div>
+                            <div class="text-sm text-gray-600">${count}回</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('prashnaResults').innerHTML = html;
+}
+
+// 初期値設定
+document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    
+    // 現在時刻をデフォルトに設定
+    document.getElementById('prashnaYear').value = now.getFullYear();
+    document.getElementById('prashnaMonth').value = now.getMonth() + 1;
+    document.getElementById('prashnaDay').value = now.getDate();
+    document.getElementById('prashnaHour').value = now.getHours();
+    document.getElementById('prashnaMinute').value = now.getMinutes();
+    
+    // 日のセレクトボックス生成
+    const daySelect = document.getElementById('prashnaDay');
+    for (let i = 1; i <= 31; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i + '日';
+        daySelect.appendChild(option);
+    }
+    
+    // 時のセレクトボックス生成
+    const hourSelect = document.getElementById('prashnaHour');
+    for (let i = 0; i <= 23; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i + '時';
+        hourSelect.appendChild(option);
+    }
+    
+    // 分のセレクトボックス生成
+    const minuteSelect = document.getElementById('prashnaMinute');
+    for (let i = 0; i <= 59; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i + '分';
+        minuteSelect.appendChild(option);
+    }
+    
+    // デフォルト値を再設定
+    document.getElementById('prashnaDay').value = now.getDate();
+    document.getElementById('prashnaHour').value = now.getHours();
+    document.getElementById('prashnaMinute').value = now.getMinutes();
+});
+</script>
+{% endblock %}
