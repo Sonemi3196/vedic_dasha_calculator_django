@@ -7,7 +7,7 @@
 {% block content %}
 <div class="space-y-6">
     <!-- 入力フォーム -->
-    <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-4 md:p-6">
+    <div id="setupSection" class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-4 md:p-6">
         <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 text-center">ダイス数秘術</h2>
         
         <div class="space-y-4">
@@ -42,8 +42,8 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">生年月日（グリッド用）</label>
                 <div class="grid grid-cols-3 gap-2">
                     <input type="number" id="diceYear" placeholder="年" min="1900" max="2025"
-                        class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg">
-                    <select id="diceMonth" class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg">
+                        class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                    <select id="diceMonth" class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
                         <option value="">月</option>
                         <option value="1">1月</option>
                         <option value="2">2月</option>
@@ -58,7 +58,7 @@
                         <option value="11">11月</option>
                         <option value="12">12月</option>
                     </select>
-                    <select id="diceDay" class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg">
+                    <select id="diceDay" class="px-3 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
                         <option value="">日</option>
                     </select>
                 </div>
@@ -126,11 +126,12 @@ function startDice() {
         }
     }
     
+    // 設定セクションを非表示にして、ダイスローラーを表示
+    document.getElementById('setupSection').style.display = 'none';
     showDiceRoller();
 }
 
 function calculateBaseGrid(year, month, day) {
-    // 簡易的なグリッド計算（views.pyの計算ロジックと同じ）
     const grid = {};
     for (let i = 1; i <= 9; i++) {
         grid[i] = '';
@@ -142,30 +143,17 @@ function calculateBaseGrid(year, month, day) {
     allDigits.push(...String(month).split('').map(Number));
     allDigits.push(...String(day).split('').map(Number));
     
-    
-    // YYYYMMDD を作る（ゼロ埋め）
     const y4 = String(year).padStart(4, '0');
     const m2 = String(month).padStart(2, '0');
     const d2 = String(day).padStart(2, '0');
-
-    // digits = YYYYMMDD の各桁
     const digitsForBhagyank = (y4 + m2 + d2).split('').map(Number);
-
-    // 合計
+    
     let bhagyank = digitsForBhagyank.reduce((a, b) => a + b, 0);
-
-    // reduce_to_single と同じ処理
     while (bhagyank >= 10) {
-        bhagyank = String(bhagyank)
-            .split('')
-            .map(Number)
-            .reduce((a, b) => a + b, 0);
+        bhagyank = String(bhagyank).split('').map(Number).reduce((a, b) => a + b, 0);
     }
-
-    // allDigits に追加
     allDigits.push(bhagyank);
-        
-    // ムーランク
+    
     if (day >= 10) {
         let moolank = day;
         while (moolank >= 10) {
@@ -192,6 +180,50 @@ function showDiceRoller() {
                 ${diceRolls.length + 1}回目（${maxRolls}回中）
             </h3>
     `;
+    
+    // グリッド使用の場合は現在のグリッドを表示
+    if (maxRolls > 1) {
+        const currentGrid = {...baseGrid};
+        diceRolls.forEach(num => {
+            currentGrid[num] += String(num);
+        });
+        
+        html += `
+            <div class="mb-6">
+                <h4 class="font-bold text-center mb-3">現在のグリッド</h4>
+                <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto">
+                    ${[3,1,9,6,7,5,2,8,4].map(n => {
+                        const baseStr = baseGrid[n] || '';
+                        const currentStr = currentGrid[n] || '';
+                        
+                        // 元の数字と追加された数字を分ける
+                        const baseCount = baseStr.length;
+                        const addedCount = currentStr.length - baseCount;
+                        
+                        let displayHTML = '';
+                        
+                        // 元の数字（紫）
+                        for (let i = 0; i < baseCount; i++) {
+                            displayHTML += `<span class="text-purple-600">${n}</span>`;
+                        }
+                        
+                        // 追加された数字（緑）
+                        for (let i = 0; i < addedCount; i++) {
+                            displayHTML += `<span class="text-green-600">${n}</span>`;
+                        }
+                        
+                        return `<div class="aspect-square bg-white border-2 border-purple-300 rounded-lg flex items-center justify-center text-2xl font-bold p-2" style="letter-spacing: -2px;">
+                            ${displayHTML}
+                        </div>`;
+                    }).join('')}
+                </div>
+                <p class="text-xs text-center mt-2 text-gray-600">
+                    <span class="text-purple-600 font-bold">紫</span>：元の数字　
+                    <span class="text-green-600 font-bold">緑</span>：追加された数字
+                </p>
+            </div>
+        `;
+    }
     
     if (diceType === 'virtual') {
         html += `
@@ -262,6 +294,18 @@ function showFinalResults() {
         9: '情熱、行動、集中力、欲望、怒り、短期、火、闘争、衝動'
     };
     
+    const numberColors = {
+        1: 'bg-red-500 text-white',
+        2: 'bg-gray-100 text-gray-900 border-4 border-gray-400',
+        3: 'bg-yellow-400 text-gray-900',
+        4: 'bg-black text-white',
+        5: 'bg-green-500 text-white',
+        6: 'bg-gray-100 text-gray-900 border-4 border-gray-400',
+        7: 'bg-gradient-to-r from-red-500 via-yellow-500 to-purple-500 text-white',
+        8: 'bg-blue-900 text-white',
+        9: 'bg-red-600 text-white'
+    };
+    
     let html = `
         <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6">
             <h3 class="text-xl font-bold text-center mb-4">鑑定結果</h3>
@@ -270,10 +314,10 @@ function showFinalResults() {
     if (maxRolls === 1) {
         // 1回振りの場合
         html += `
-            <div class="bg-white rounded-lg p-6 text-center border-2 border-purple-500">
+            <div class="rounded-lg p-6 text-center border-2 border-purple-500 ${numberColors[diceRolls[0]]}">
                 <div class="text-7xl mb-4">🎲</div>
-                <div class="text-6xl font-bold text-purple-600 mb-3">${diceRolls[0]}</div>
-                <p class="text-gray-700 text-lg">${meanings[diceRolls[0]]}</p>
+                <div class="text-6xl font-bold mb-3">${diceRolls[0]}</div>
+                <p class="text-lg">${meanings[diceRolls[0]]}</p>
             </div>
         `;
     } else {
@@ -286,9 +330,9 @@ function showFinalResults() {
         html += `
             <div class="mb-6">
                 <h4 class="font-bold text-center mb-3">振った結果</h4>
-                <div class="flex justify-center gap-3">
+                <div class="flex justify-center gap-3 flex-wrap">
                     ${diceRolls.map(num => `
-                        <div class="w-16 h-16 bg-white border-2 border-purple-500 rounded-lg flex items-center justify-center text-3xl font-bold">
+                        <div class="w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold border-2 border-purple-500 ${numberColors[num]}">
                             ${num}
                         </div>
                     `).join('')}
@@ -296,30 +340,41 @@ function showFinalResults() {
             </div>
             
             <div class="bg-white rounded-lg p-6">
-                <h4 class="font-bold text-center mb-3">グリッド（ダイス追加後）</h4>
+                <h4 class="font-bold text-center mb-3">最終グリッド</h4>
                 <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto mb-4">
                     ${[3,1,9,6,7,5,2,8,4].map(n => {
-                        const baseCount = (baseGrid[n] || '').length;
-                        const totalCount = (updatedGrid[n] || '').length;
-                        const addedCount = totalCount - baseCount;
+                        const baseStr = baseGrid[n] || '';
+                        const currentStr = updatedGrid[n] || '';
+                        const baseCount = baseStr.length;
+                        const addedCount = currentStr.length - baseCount;
                         
-                        return `<div class="aspect-square bg-white border-2 border-purple-300 rounded-lg flex flex-col items-center justify-center p-2">
-                            <div class="text-3xl font-bold ${addedCount > 0 ? 'text-green-600' : 'text-purple-600'}">
-                                ${updatedGrid[n] || ''}
-                            </div>
-                            ${addedCount > 0 ? `<div class="text-xs text-green-600 mt-1">+${addedCount}</div>` : ''}
+                        let displayHTML = '';
+                        
+                        // 元の数字（紫）
+                        for (let i = 0; i < baseCount; i++) {
+                            displayHTML += `<span class="text-purple-600">${n}</span>`;
+                        }
+                        
+                        // 追加された数字（緑）
+                        for (let i = 0; i < addedCount; i++) {
+                            displayHTML += `<span class="text-green-600">${n}</span>`;
+                        }
+                        
+                        return `<div class="aspect-square bg-white border-2 border-purple-300 rounded-lg flex items-center justify-center text-2xl md:text-3xl font-bold p-2" style="letter-spacing: -2px;">
+                            ${displayHTML || ''}
                         </div>`;
                     }).join('')}
                 </div>
                 <p class="text-xs text-center text-gray-600">
-                    <span class="text-green-600 font-bold">緑色</span> = ダイスで追加された数字
+                    <span class="text-purple-600 font-bold">紫</span>：元の数字　
+                    <span class="text-green-600 font-bold">緑</span>：追加された数字
                 </p>
             </div>
         `;
     }
     
     html += `
-            <button onclick="startDice()" 
+            <button onclick="resetDice()" 
                 class="w-full mt-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-2.5 rounded-lg hover:from-purple-700 hover:to-blue-700 transition">
                 もう一度占う
             </button>
@@ -327,6 +382,13 @@ function showFinalResults() {
     `;
     
     document.getElementById('diceResults').innerHTML = html;
+}
+
+function resetDice() {
+    diceRolls = [];
+    baseGrid = null;
+    document.getElementById('setupSection').style.display = 'block';
+    document.getElementById('diceResults').innerHTML = '';
 }
 
 // 初期値設定

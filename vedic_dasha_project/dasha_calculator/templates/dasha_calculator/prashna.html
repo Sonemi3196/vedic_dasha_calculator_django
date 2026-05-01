@@ -159,6 +159,18 @@ function displayPrashnaResults(pyramid, frequency, dateStr, hour, minute) {
         9: '情熱、行動、集中力、欲望、怒り、短期、火、闘争、衝動'
     };
     
+    const numberColors = {
+        1: 'bg-red-500 text-white',
+        2: 'bg-gray-100 text-gray-900 border-4 border-gray-400',
+        3: 'bg-yellow-400 text-gray-900',
+        4: 'bg-black text-white',
+        5: 'bg-green-500 text-white',
+        6: 'bg-gray-100 text-gray-900 border-4 border-gray-400',
+        7: 'bg-gradient-to-r from-red-500 via-yellow-500 to-purple-500 text-white',
+        8: 'bg-blue-900 text-white',
+        9: 'bg-red-600 text-white'
+    };
+    
     // 頻度順にソート
     const sortedFreq = Object.entries(frequency).sort((a, b) => b[1] - a[1]);
     
@@ -191,10 +203,10 @@ function displayPrashnaResults(pyramid, frequency, dateStr, hour, minute) {
             </div>
             
             <!-- 最終結果 -->
-            <div class="bg-white rounded-lg p-6 mb-4 text-center border-2 border-purple-500">
+            <div class="rounded-lg p-6 mb-4 text-center border-2 ${numberColors[finalNumber]}">
                 <h4 class="font-bold mb-2">最終結果</h4>
-                <div class="text-6xl font-bold text-purple-600 mb-3">${finalNumber}</div>
-                <p class="text-gray-700">${meanings[finalNumber]}</p>
+                <div class="text-6xl font-bold mb-3">${finalNumber}</div>
+                <p class="text-lg">${meanings[finalNumber]}</p>
             </div>
             
             <!-- 数字の出現頻度 -->
