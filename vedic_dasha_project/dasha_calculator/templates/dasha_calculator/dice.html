@@ -86,13 +86,14 @@ function changeDiceMethod() {
     const method = document.getElementById('diceMethod').value;
     const gridSection = document.getElementById('gridDateSection');
     
-    if (method === '1') {
+    if (method != '3') {
         gridSection.classList.add('hidden');
-        maxRolls = 1;
+        //maxRolls = 1;
     } else {
         gridSection.classList.remove('hidden');
-        maxRolls = parseInt(method);
+        //maxRolls = parseInt(method);
     }
+    maxRolls = parseInt(method);
 }
 
 function startDice() {
@@ -100,29 +101,38 @@ function startDice() {
     maxRolls = method;
     diceRolls = [];
     
-    // グリッド使用の場合、生年月日からグリッドを作成
+    // グリッド使用の場合
     if (method > 1) {
-        const year = document.getElementById('diceYear').value;
-        const month = document.getElementById('diceMonth').value;
-        const day = document.getElementById('diceDay').value;
-        
-        if (!year || !month || !day) {
-            // LocalStorageから取得を試みる
-            const savedYear = localStorage.getItem('last_year');
-            const savedMonth = localStorage.getItem('last_month');
-            const savedDay = localStorage.getItem('last_day');
+        if (method === 3) {
+            // 3回：生年月日からグリッドを作成
+            const year = document.getElementById('diceYear').value;
+            const month = document.getElementById('diceMonth').value;
+            const day = document.getElementById('diceDay').value;
             
-            if (savedYear && savedMonth && savedDay) {
-                document.getElementById('diceYear').value = savedYear;
-                document.getElementById('diceMonth').value = savedMonth;
-                document.getElementById('diceDay').value = savedDay;
-                baseGrid = calculateBaseGrid(savedYear, savedMonth, savedDay);
+            if (!year || !month || !day) {
+                // LocalStorageから取得を試みる
+                const savedYear = localStorage.getItem('last_year');
+                const savedMonth = localStorage.getItem('last_month');
+                const savedDay = localStorage.getItem('last_day');
+                
+                if (savedYear && savedMonth && savedDay) {
+                    document.getElementById('diceYear').value = savedYear;
+                    document.getElementById('diceMonth').value = savedMonth;
+                    document.getElementById('diceDay').value = savedDay;
+                    baseGrid = calculateBaseGrid(savedYear, savedMonth, savedDay);
+                } else {
+                    alert('生年月日を入力してください');
+                    return;
+                }
             } else {
-                alert('生年月日を入力してください');
-                return;
+                baseGrid = calculateBaseGrid(year, month, day);
             }
-        } else {
-            baseGrid = calculateBaseGrid(year, month, day);
+        } else if (method === 5) {
+            // 5回：空のグリッドから始める
+            baseGrid = {};
+            for (let i = 1; i <= 9; i++) {
+                baseGrid[i] = '';
+            }
         }
     }
     
@@ -130,6 +140,8 @@ function startDice() {
     document.getElementById('setupSection').style.display = 'none';
     showDiceRoller();
 }
+    
+   
 
 function calculateBaseGrid(year, month, day) {
     const grid = {};
@@ -202,14 +214,19 @@ function showDiceRoller() {
                         
                         let displayHTML = '';
                         
-                        // 元の数字（紫）
-                        for (let i = 0; i < baseCount; i++) {
-                            displayHTML += `<span class="text-purple-600">${n}</span>`;
-                        }
-                        
-                        // 追加された数字（緑）
-                        for (let i = 0; i < addedCount; i++) {
-                            displayHTML += `<span class="text-green-600">${n}</span>`;
+                        if (maxRolls === 3) {
+                            // 3回：元の数字（紫）と追加された数字（緑）
+                            for (let i = 0; i < baseCount; i++) {
+                                displayHTML += `<span class="text-purple-600">${n}</span>`;
+                            }
+                            for (let i = 0; i < addedCount; i++) {
+                                displayHTML += `<span class="text-green-600">${n}</span>`;
+                            }
+                        } else {
+                            // 5回：全て緑（空のグリッドから始まるため）
+                            for (let i = 0; i < currentStr.length; i++) {
+                                displayHTML += `<span class="text-green-600">${n}</span>`;
+                            }
                         }
                         
                         return `<div class="aspect-square bg-white border-2 border-purple-300 rounded-lg flex items-center justify-center text-2xl font-bold p-2" style="letter-spacing: -2px;">
@@ -217,10 +234,15 @@ function showDiceRoller() {
                         </div>`;
                     }).join('')}
                 </div>
-                <p class="text-xs text-center mt-2 text-gray-600">
-                    <span class="text-purple-600 font-bold">紫</span>：元の数字　
-                    <span class="text-green-600 font-bold">緑</span>：追加された数字
-                </p>
+                ${maxRolls === 3 ? 
+                    `<p class="text-xs text-center mt-2 text-gray-600">
+                        <span class="text-purple-600 font-bold">紫</span>：元の数字　
+                        <span class="text-green-600 font-bold">緑</span>：追加された数字
+                    </p>` :
+                    `<p class="text-xs text-center mt-2 text-gray-600">
+                        <span class="text-green-600 font-bold">緑</span>：ダイスで出た数字
+                    </p>`
+                }
             </div>
         `;
     }
@@ -350,14 +372,19 @@ function showFinalResults() {
                         
                         let displayHTML = '';
                         
-                        // 元の数字（紫）
-                        for (let i = 0; i < baseCount; i++) {
-                            displayHTML += `<span class="text-purple-600">${n}</span>`;
-                        }
-                        
-                        // 追加された数字（緑）
-                        for (let i = 0; i < addedCount; i++) {
-                            displayHTML += `<span class="text-green-600">${n}</span>`;
+                        if (maxRolls === 3) {
+                            // 3回：元の数字（紫）と追加された数字（緑）
+                            for (let i = 0; i < baseCount; i++) {
+                                displayHTML += `<span class="text-purple-600">${n}</span>`;
+                            }
+                            for (let i = 0; i < addedCount; i++) {
+                                displayHTML += `<span class="text-green-600">${n}</span>`;
+                            }
+                        } else {
+                            // 5回：全て緑（空のグリッドから始まるため）
+                            for (let i = 0; i < currentStr.length; i++) {
+                                displayHTML += `<span class="text-green-600">${n}</span>`;
+                            }
                         }
                         
                         return `<div class="aspect-square bg-white border-2 border-purple-300 rounded-lg flex items-center justify-center text-2xl md:text-3xl font-bold p-2" style="letter-spacing: -2px;">
@@ -365,10 +392,15 @@ function showFinalResults() {
                         </div>`;
                     }).join('')}
                 </div>
-                <p class="text-xs text-center text-gray-600">
-                    <span class="text-purple-600 font-bold">紫</span>：元の数字　
-                    <span class="text-green-600 font-bold">緑</span>：追加された数字
-                </p>
+                ${maxRolls === 3 ?
+                    `<p class="text-xs text-center text-gray-600">
+                        <span class="text-purple-600 font-bold">紫</span>：元の数字　
+                        <span class="text-green-600 font-bold">緑</span>：追加された数字
+                    </p>` :
+                    `<p class="text-xs text-center text-gray-600">
+                        <span class="text-green-600 font-bold">緑</span>：ダイスで出た数字
+                    </p>`
+                }
             </div>
         `;
     }
@@ -383,7 +415,6 @@ function showFinalResults() {
     
     document.getElementById('diceResults').innerHTML = html;
 }
-
 function resetDice() {
     diceRolls = [];
     baseGrid = null;
