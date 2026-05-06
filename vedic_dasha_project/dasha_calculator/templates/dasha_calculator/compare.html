@@ -321,7 +321,7 @@
         </div>
     </div>
     
-    <div class="person-input">
+   <div class="person-input">
         <h3 class="text-lg font-bold mb-3">２人目</h3>
         <div class="form-group">
             <label for="personBName">なまえ(ひらがな):</label>
@@ -331,6 +331,17 @@
             <label for="personBBirth">生年月日:</label>
             <input type="date" id="personBBirth" required class="flex-1 min-w-0 px-2 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
         </div>
+        
+        {% if user.is_authenticated %}
+        <!-- 保存リストから選択 -->
+        <div class="form-group mt-2">
+            <label class="text-sm font-medium text-gray-700 mb-1 block">保存リストから選択:</label>
+            <select id="savedPersonSelect" onchange="loadSavedPerson()"
+                class="w-full px-2 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                <option value="">-- 選択してください --</option>
+            </select>
+        </div>
+        {% endif %}
     </div>
     
     <button class="my-button" onclick="compareAll()">比較開始</button>
@@ -416,6 +427,8 @@ let allData = null;
 let filteredData = null;
 let personAData = null;
 let personBData = null;
+
+
 
 function getCookie(name) {
     let cookieValue = null;
@@ -798,5 +811,90 @@ document.addEventListener('DOMContentLoaded', function() {
     const twentyFiveYearsAgo = new Date(today.getFullYear() - 25, today.getMonth(), today.getDate());
     document.getElementById('personBBirth').value = twentyFiveYearsAgo.toISOString().split('T')[0];
 });
+
+// 保存リストを読み込んでセレクトボックスに表示
+{% if user.is_authenticated %}
+async function loadSavedPersonList() {
+    try {
+        const response = await fetch('/saved/list/api/');
+        const data = await response.json();
+        if (data.success) {
+            const select = document.getElementById('savedPersonSelect');
+            data.persons.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = `${p.name}（${p.birth_year}/${p.birth_month}/${p.birth_day}）`;
+                select.appendChild(option);
+            });
+        }
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+async function loadSavedPerson() {
+    const id = document.getElementById('savedPersonSelect').value;
+    if (!id) return;
+    
+    const response = await fetch(`/saved/${id}/load/`);
+    const data = await response.json();
+    
+    if (data.success) {
+        document.getElementById('personBName').value = data.person.name;
+        const m = String(data.person.birth_month).padStart(2, '0');
+        const d = String(data.person.birth_day).padStart(2, '0');
+        document.getElementById('personBBirth').value = `${data.person.birth_year}-${m}-${d}`;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadSavedPersonList();
+    // 既存のDOMContentLoadedの内容もここに残す
+    const name = localStorage.getItem('last_name');
+    const year = localStorage.getItem('last_year');
+    const month = localStorage.getItem('last_month');
+    const day = localStorage.getItem('last_day');
+    
+    if (name) document.getElementById('personAName').value = name;
+    
+    if (year && month && day) {
+        const m = month.padStart(2, '0');
+        const d = day.padStart(2, '0');
+        document.getElementById('personABirth').value = `${year}-${m}-${d}`;
+    } else {
+        const today = new Date();
+        const thirtyYearsAgo = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
+        document.getElementById('personABirth').value = thirtyYearsAgo.toISOString().split('T')[0];
+    }
+    
+    const today = new Date();
+    const twentyFiveYearsAgo = new Date(today.getFullYear() - 25, today.getMonth(), today.getDate());
+    document.getElementById('personBBirth').value = twentyFiveYearsAgo.toISOString().split('T')[0];
+});
+{% else %}
+document.addEventListener('DOMContentLoaded', function() {
+    const name = localStorage.getItem('last_name');
+    const year = localStorage.getItem('last_year');
+    const month = localStorage.getItem('last_month');
+    const day = localStorage.getItem('last_day');
+    
+    if (name) document.getElementById('personAName').value = name;
+    
+    if (year && month && day) {
+        const m = month.padStart(2, '0');
+        const d = day.padStart(2, '0');
+        document.getElementById('personABirth').value = `${year}-${m}-${d}`;
+    } else {
+        const today = new Date();
+        const thirtyYearsAgo = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
+        document.getElementById('personABirth').value = thirtyYearsAgo.toISOString().split('T')[0];
+    }
+    
+    const today = new Date();
+    const twentyFiveYearsAgo = new Date(today.getFullYear() - 25, today.getMonth(), today.getDate());
+    document.getElementById('personBBirth').value = twentyFiveYearsAgo.toISOString().split('T')[0];
+});
+{% endif %}
+
 </script>
 {% endblock %}

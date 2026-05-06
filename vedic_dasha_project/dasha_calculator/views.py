@@ -575,7 +575,25 @@ def register_api(request):
         return JsonResponse({'success': False, 'error': str(e)})
 
 @login_required
+def saved_list_api(request):
+    """保存リストをJSON形式で返す"""
+    persons = SavedPerson.objects.filter(user=request.user)
+    return JsonResponse({
+        'success': True,
+        'persons': [
+            {
+                'id': p.id,
+                'name': p.name,
+                'birth_year': p.birth_year,
+                'birth_month': p.birth_month,
+                'birth_day': p.birth_day,
+            }
+            for p in persons
+        ]
+    })
+@login_required
 def saved_list(request):
+    """保存リスト表示"""
     saved_persons = SavedPerson.objects.filter(user=request.user)
     return render(request, 'dasha_calculator/saved_list.html', {
         'saved_persons': saved_persons,
