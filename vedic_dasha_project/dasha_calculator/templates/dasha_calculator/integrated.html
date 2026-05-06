@@ -13,10 +13,16 @@
         <div class="space-y-3">
             <!-- 名前入力を1行に -->
             
-            <div class="flex items-center gap-2">
+           <div class="flex items-center gap-2">
                 <label class="text-sm font-medium text-gray-700 w-12 flex-shrink-0">なまえ</label>
                 <input type="text" id="name" placeholder="たなか" 
                     class="flex-1 min-w-0 px-2 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                {% if user.is_authenticated %}
+                <button onclick="openSavedModal(loadPersonToMain, '鑑定する人を選択')"
+                    class="flex-shrink-0 px-3 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg text-sm font-medium transition">
+                    📋
+                </button>
+                {% endif %}
             </div>
             
             <!-- 生年月日入力 -->
@@ -404,6 +410,18 @@ function goToComparison() {
     window.location.href = '/compare/';
 }
 
+function loadPersonToMain(person) {
+    document.getElementById('name').value = person.name;
+    document.getElementById('birthYear').value = person.birth_year;
+    document.getElementById('birthMonth').value = person.birth_month;
+    document.getElementById('birthDay').value = person.birth_day;
+    
+    // localStorageも更新
+    localStorage.setItem('last_name', person.name);
+    localStorage.setItem('last_year', person.birth_year);
+    localStorage.setItem('last_month', person.birth_month);
+    localStorage.setItem('last_day', person.birth_day);
+}
 
 </script>
 {% endblock %}
