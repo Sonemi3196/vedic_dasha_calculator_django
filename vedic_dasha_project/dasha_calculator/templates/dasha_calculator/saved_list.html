@@ -15,50 +15,48 @@
     <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6">
         <div class="space-y-3" id="personList">
             {% for person in saved_persons %}
-            <div class="bg-white rounded-lg p-4 flex justify-between items-center" id="person-{{ person.id }}">
+            <div class="bg-white rounded-lg p-4" id="person-{{ person.id }}">
                 <!-- 通常表示 -->
-                <div class="view-mode flex-1 cursor-pointer" onclick="loadPerson('{{ person.id }}')">
-                    <div class="font-bold">{{ person.name }}</div>
-                    <div class="text-sm text-gray-600">{{ person.birth_year }}年{{ person.birth_month }}月{{ person.birth_day }}日</div>
+                <div class="view-mode flex justify-between items-center">
+                    <div class="flex-1 cursor-pointer" onclick="loadPerson({{ person.id }})">
+                        <div class="font-bold">{{ person.name }}</div>
+                        <div class="text-sm text-gray-600">{{ person.birth_year }}年{{ person.birth_month }}月{{ person.birth_day }}日</div>
+                    </div>
+                    <div class="flex gap-2 ml-3 flex-shrink-0">
+                        <button onclick="startEdit({{ person.id }})"
+                            class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">
+                            編集
+                        </button>
+                        <button onclick="deletePerson({{ person.id }})"
+                            class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
+                            削除
+                        </button>
+                    </div>
                 </div>
+
                 <!-- 編集モード（最初は非表示） -->
-                <div class="edit-mode hidden flex-1 space-y-2">
-                    <input type="text" class="edit-name w-full px-2 py-1 border-2 border-purple-300 rounded-lg text-sm" value="{{ person.name }}">
-                    <div class="grid grid-cols-3 gap-1">
-                        <input type="number" class="edit-year px-2 py-1 border-2 border-purple-300 rounded-lg text-sm" value="{{ person.birth_year }}" placeholder="年">
-                        <select class="edit-month px-2 py-1 border-2 border-purple-300 rounded-lg text-sm">
-                            {% for m in "123456789" %}{% with m|add:"0" as mv %}{% endwith %}{% endfor %}
+                <div class="edit-mode hidden w-full space-y-2">
+                    <input type="text" class="edit-name w-full px-3 py-2 border-2 border-purple-300 rounded-lg text-base" value="{{ person.name }}">
+                    <div class="flex gap-2">
+                        <input type="number" class="edit-year w-24 px-3 py-2 border-2 border-purple-300 rounded-lg text-base" value="{{ person.birth_year }}" placeholder="年">
+                        <select class="edit-month flex-1 px-2 py-2 border-2 border-purple-300 rounded-lg text-base">
                             {% for m in months %}
                             <option value="{{ m }}" {% if m == person.birth_month %}selected{% endif %}>{{ m }}月</option>
                             {% endfor %}
                         </select>
-                        <select class="edit-day px-2 py-1 border-2 border-purple-300 rounded-lg text-sm">
+                        <select class="edit-day flex-1 px-2 py-2 border-2 border-purple-300 rounded-lg text-base">
                             {% for d in days %}
                             <option value="{{ d }}" {% if d == person.birth_day %}selected{% endif %}>{{ d }}日</option>
                             {% endfor %}
                         </select>
                     </div>
-                </div>
-                <div class="flex gap-2 ml-3 flex-shrink-0">
-                    <!-- 通常時ボタン -->
-                    <div class="view-buttons flex gap-2">
-                        <button onclick="startEdit('{{ person.id }}')"
-                            class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">
-                            編集
-                        </button>
-                        <button onclick="deletePerson('{{ person.id }}')"
-                            class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
-                            削除
-                        </button>
-                    </div>
-                    <!-- 編集時ボタン -->
-                    <div class="edit-buttons hidden flex gap-2">
-                        <button onclick="savePerson('{{ person.id }}')"
-                            class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm">
+                    <div class="flex gap-2">
+                        <button onclick="savePerson({{ person.id }})"
+                            class="flex-1 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm font-medium">
                             保存
                         </button>
-                        <button onclick="cancelEdit('{{ person.id }}')"
-                            class="px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 text-sm">
+                        <button onclick="cancelEdit({{ person.id }})"
+                            class="flex-1 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 text-sm font-medium">
                             キャンセル
                         </button>
                     </div>
