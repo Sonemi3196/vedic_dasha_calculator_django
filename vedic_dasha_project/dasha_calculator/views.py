@@ -508,3 +508,172 @@ def dice_view(request):
     return render(request, 'dasha_calculator/dice.html')
     
     
+# dasha_calculator/views.py に追加
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.shortcuts import redirect
+from .models import SavedPerson
+
+def login_view(request):
+    """ログインページ"""
+    return render(request, 'dasha_calculator/login.html')
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def login_api(request):
+    """ログインAPI"""
+    try:
+        data = json.loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
+        
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'error': 'ユーザー名またはパスワードが正しくありません'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+def logout_view(request):
+    """ログアウト"""
+    logout(request)
+    return redirect('dasha_calculator:login')
+
+def register_view(request):
+    """新規登録ページ"""
+    return render(request, 'dasha_calculator/register.html')
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def register_api(request):
+    try:
+        data = json.loads(request.body)
+        username = data.get('username', '').strip()
+        password = data.get('password', '')
+        
+        if len(username) < 3:
+            return JsonResponse({'success': False, 'error': 'ユーザー名は3文字以上にしてください'})
+        
+        if len(password) < 4:
+            return JsonResponse({'success': False, 'error': 'パスワードは4文字以上にしてください'})
+        
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({'success': False, 'error': 'このユーザー名は既に使用されています'})
+        
+        # Djangoのパスワードバリデーションを無効化して作成
+        user = User.objects.create_user(username=username, password=password)
+        # パスワードポリシーを無視して強制的に設定
+        user.set_password(password)
+        user.save()
+        
+        login(request, user)
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+def saved_list(request):
+    saved_persons = SavedPerson.objects.filter(user=request.user)
+    return render(request, 'dasha_calculator/saved_list.html', {
+        'saved_persons': saved_persons,
+        'months': range(1, 13),
+        'days': range(1, 32),
+    })
+@login_required
+@csrf_exempt
+@require_http_methods(["POST"])
+def save_person(request):
+    try:
+        data = json.loads(request.body)
+        name = data.get('name', '').strip()
+        birth_year = int(data.get('birth_year'))
+        birth_month = int(data.get('birth_month'))
+        birth_day = int(data.get('birth_day'))
+        
+        if not name:
+            return JsonResponse({'success': False, 'error': '名前を入力してください'})
+        
+        # 重複チェック
+        if SavedPerson.objects.filter(
+            user=request.user,
+            name=name,
+            birth_year=birth_year,
+            birth_month=birth_month,
+            birth_day=birth_day
+        ).exists():
+            return JsonResponse({'success': False, 'error': f'「{name}」は既に保存されています'})
+        
+        person = SavedPerson.objects.create(
+            user=request.user,
+            name=name,
+            birth_year=birth_year,
+            birth_month=birth_month,
+            birth_day=birth_day
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'person': {
+                'id': person.id,
+                'name': person.name,
+                'birth_date': person.birth_date_str
+            }
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@login_required
+@csrf_exempt
+@require_http_methods(["POST"])
+def edit_person(request, pk):
+    """人物データ編集"""
+    try:
+        person = SavedPerson.objects.get(pk=pk, user=request.user)
+        data = json.loads(request.body)
+        
+        person.name = data.get('name', person.name)
+        person.birth_year = data.get('birth_year', person.birth_year)
+        person.birth_month = data.get('birth_month', person.birth_month)
+        person.birth_day = data.get('birth_day', person.birth_day)
+        person.save()
+        
+        return JsonResponse({'success': True})
+    except SavedPerson.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'データが見つかりません'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+@csrf_exempt
+@require_http_methods(["POST"])
+def delete_person(request, pk):
+    """人物データ削除"""
+    try:
+        person = SavedPerson.objects.get(pk=pk, user=request.user)
+        person.delete()
+        return JsonResponse({'success': True})
+    except SavedPerson.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'データが見つかりません'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+def load_person(request, pk):
+    """人物データ読み込み"""
+    try:
+        person = SavedPerson.objects.get(pk=pk, user=request.user)
+        return JsonResponse({
+            'success': True,
+            'person': {
+                'name': person.name,
+                'birth_year': person.birth_year,
+                'birth_month': person.birth_month,
+                'birth_day': person.birth_day
+            }
+        })
+    except SavedPerson.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'データが見つかりません'})

@@ -89,3 +89,36 @@ class DashaCalculation(models.Model):
             maha_dasha_number = 1 if maha_dasha_number == 9 else maha_dasha_number + 1
         
         return results
+    # dasha_calculator/models.py に追加
+from django.contrib.auth.models import User
+from django.db import models
+
+class UserProfile(models.Model):
+    """ユーザープロフィール"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vedic_profile')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.user.username}のプロフィール"
+
+class SavedPerson(models.Model):
+    """保存された人物データ"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_persons')
+    name = models.CharField(max_length=100, verbose_name="名前")
+    birth_year = models.IntegerField(verbose_name="生年")
+    birth_month = models.IntegerField(verbose_name="生月")
+    birth_day = models.IntegerField(verbose_name="生日")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="作成日時")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="更新日時")
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "保存された人物"
+        verbose_name_plural = "保存された人物一覧"
+    
+    def __str__(self):
+        return f"{self.name} ({self.birth_year}/{self.birth_month}/{self.birth_day})"
+    
+    @property
+    def birth_date_str(self):
+        return f"{self.birth_year}-{str(self.birth_month).zfill(2)}-{str(self.birth_day).zfill(2)}"

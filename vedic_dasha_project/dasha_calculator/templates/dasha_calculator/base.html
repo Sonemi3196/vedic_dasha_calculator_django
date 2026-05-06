@@ -69,6 +69,20 @@
                     </a>                    
                 </nav>
 
+                <!-- ログイン状態に応じたナビゲーション -->
+                <div class="flex justify-end gap-2 mb-2">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dasha_calculator:saved_list' %}" class="text-sm text-purple-600 hover:text-purple-700">
+                            保存リスト
+                        </a>
+                        <span class="text-sm text-gray-500">{{ user.username }}</span>
+                    {% else %}
+                        <a href="{% url 'dasha_calculator:login' %}" class="text-sm text-purple-600 hover:text-purple-700">
+                            ログイン
+                        </a>
+                    {% endif %}
+                </div>
+
                 <script>
                 function goToComparison() {
                     // integrated.html から呼ばれる場合のフォールバック

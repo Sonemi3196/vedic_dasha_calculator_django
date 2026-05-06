@@ -772,16 +772,22 @@ function clearFilter() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // LocalStorageから人Aのデータを読み込み
-    const personAName = localStorage.getItem('personA_name');
-    const personABirth = localStorage.getItem('personA_birth');
+    // localStorageの古いデータをクリア
+    localStorage.removeItem('personA_name');
+    localStorage.removeItem('personA_birth');
     
-    if (personAName) {
-        document.getElementById('personAName').value = personAName;
-    }
+    // 総合鑑定の入力欄と同じキーから読み込む
+    const name = localStorage.getItem('last_name');
+    const year = localStorage.getItem('last_year');
+    const month = localStorage.getItem('last_month');
+    const day = localStorage.getItem('last_day');
     
-    if (personABirth) {
-        document.getElementById('personABirth').value = personABirth;
+    if (name) document.getElementById('personAName').value = name;
+    
+    if (year && month && day) {
+        const m = month.padStart(2, '0');
+        const d = day.padStart(2, '0');
+        document.getElementById('personABirth').value = `${year}-${m}-${d}`;
     } else {
         const today = new Date();
         const thirtyYearsAgo = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());

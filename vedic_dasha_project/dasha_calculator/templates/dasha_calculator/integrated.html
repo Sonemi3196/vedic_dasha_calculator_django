@@ -59,10 +59,51 @@
 
         </div>
         
+        <!-- 鑑定開始ボタンの下に追加 -->
         <button onclick="calculateAll()" 
             class="w-full mt-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-2.5 rounded-lg transition duration-200 shadow-md text-base">
             鑑定開始
         </button>
+
+        {% if user.is_authenticated %}
+        <button onclick="saveCurrentPerson()" 
+            class="w-full mt-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-2.5 rounded-lg transition duration-200 shadow-md text-base">
+            💾 この情報を保存
+        </button>
+        {% endif %}
+
+        <script>
+        async function saveCurrentPerson() {
+            const name = document.getElementById('name').value;
+            const year = document.getElementById('birthYear').value;
+            const month = document.getElementById('birthMonth').value;
+            const day = document.getElementById('birthDay').value;
+            
+            if (!name || !year || !month || !day) {
+                alert('全ての項目を入力してください');
+                return;
+            }
+            
+            const response = await fetch('/saved/add/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: name,
+                    birth_year: year,
+                    birth_month: month,
+                    birth_day: day
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('保存しました！');
+            } else {
+                alert('エラー: ' + data.error);
+            }
+        }
+        </script>
     </div>
 
     <!-- 結果表示エリア -->
