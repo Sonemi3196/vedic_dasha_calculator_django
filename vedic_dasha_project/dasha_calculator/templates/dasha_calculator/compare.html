@@ -15,51 +15,23 @@
         background: #f8f9fa;
         border-radius: 15px;
     }
-    
     .person-input {
         padding: 20px;
         background: linear-gradient(to bottom right, #faf5ff, #eff6ff);
         border-radius: 10px;
     }
-    
-    .form-group {
-        margin-bottom: 15px;
-    }
-    
-    label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: bold;
-        color: #555;
-    }
-    
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
     input, select {
         width: 100%;
         padding: 12px;
-        border: 2px solid #d8b4fe; /* purple-300 */
+        border: 2px solid #d8b4fe;
         border-radius: 8px;
         font-size: 16px;
         box-sizing: border-box;
-        transition: border-color 0.2s; /* スムーズに変化 */
+        transition: border-color 0.2s;
     }
-
-    input:focus, select:focus {
-        border-color: #9333ea; /* purple-600 */
-    }
-    
-    button {
-        background: linear-gradient(45deg, #667eea, #764ba2);
-        color: white;
-        border: none;
-        padding: 15px 30px;
-        border-radius: 10px;
-        font-size: 16px;
-        cursor: pointer;
-        width: 100%;
-        grid-column: 1 / -1;
-        margin-top: 20px;
-    }
-
+    input:focus, select:focus { border-color: #9333ea; }
     .my-button {
         display: block;
         margin: 20px auto 0;
@@ -70,37 +42,16 @@
         border: none;
         border-radius: 8px;
         cursor: pointer;
-
         background: linear-gradient(to right, #9333ea, #2563eb);
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: background 0.2s ease, box-shadow 0.2s ease;
+        transition: background 0.2s ease;
+        width: 100%;
+        grid-column: 1 / -1;
     }
-
-    .my-button:hover {
-        background: linear-gradient(to right, #7e22ce, #1d4ed8);
-    }
-
-    
-    .filter-section {
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 10px;
-        margin: 20px 0;
-    }
-    
-    .filter-controls {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-    }
-    
-    .year-group {
-        border: 2px solid #e9ecef;
-        border-radius: 10px;
-        margin: 10px 0;
-        overflow: hidden;
-    }
-    
+    .my-button:hover { background: linear-gradient(to right, #7e22ce, #1d4ed8); }
+    .filter-section { background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; }
+    .filter-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+    .year-group { border: 2px solid #e9ecef; border-radius: 10px; margin: 10px 0; overflow: hidden; }
     .year-header {
         background: #667eea;
         color: white;
@@ -111,128 +62,34 @@
         align-items: center;
         user-select: none;
     }
-    
-    .year-header:hover {
-        background: #5568d3;
-    }
-    
-    .year-header .toggle-icon {
-        font-size: 20px;
-        transition: transform 0.3s;
-    }
-    
-    .year-header.collapsed .toggle-icon {
-        transform: rotate(-90deg);
-    }
-    
-    .year-content {
-        max-height: 2000px;
-        transition: max-height 0.3s ease-out;
-        overflow: hidden;
-    }
-    
-    .year-content.collapsed {
-        max-height: 0;
-    }
-    
-    .comparison-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    
-    .comparison-table th,
-    .comparison-table td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: center;
-    }
-    
-    .comparison-table th {
-        background: #667eea;
-        color: white;
-        font-weight: bold;
-    }
-    
-    .comparison-table tr:nth-child(even) {
-        background: #f8f9fa;
-    }
-    
+    .year-header:hover { background: #5568d3; }
+    .year-header .toggle-icon { font-size: 20px; transition: transform 0.3s; }
+    .year-header.collapsed .toggle-icon { transform: rotate(-90deg); }
+    .year-content { max-height: 2000px; transition: max-height 0.3s ease-out; overflow: hidden; }
+    .year-content.collapsed { max-height: 0; }
+    .comparison-table { width: 100%; border-collapse: collapse; }
+    .comparison-table th, .comparison-table td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+    .comparison-table th { background: #667eea; color: white; font-weight: bold; }
+    .comparison-table tr:nth-child(even) { background: #f8f9fa; }
     .maha-number {
-        display: inline-block;
-        background: #667eea;
-        color: white;
-        width: 25px;
-        height: 25px;
-        border-radius: 50%;
-        text-align: center;
-        line-height: 25px;
-        font-size: 12px;
-        margin-right: 5px;
+        display: inline-block; background: #667eea; color: white;
+        width: 25px; height: 25px; border-radius: 50%;
+        text-align: center; line-height: 25px; font-size: 12px; margin-right: 5px;
     }
-    
     .antara-number {
-        display: inline-block;
-        background: #28a745;
-        color: white;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        text-align: center;
-        line-height: 20px;
-        font-size: 10px;
+        display: inline-block; background: #28a745; color: white;
+        width: 20px; height: 20px; border-radius: 50%;
+        text-align: center; line-height: 20px; font-size: 10px;
     }
-    
-    .current-row {
-        background: #ffe6e6 !important;
-        border-left: 4px solid #ff6b6b;
-    }
-    
-    .age-display {
-        font-size: 12px;
-        color: #666;
-    }
-    
-    .nav-button {
-        background: #28a745;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        margin: 0 5px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    
-    .expand-collapse-all {
-        margin: 10px 0;
-    }
-    
-    .hidden {
-        display: none;
-    }
-    .date-input-group {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 10px;
-    }
-
-    .date-input-group input,
-    .date-input-group select {
-        padding: 12px;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        font-size: 16px;
-    }
-
-    .date-input-group input[type="number"] {
-        -moz-appearance: textfield;
-    }
-
-    .date-input-group input[type="number"]::-webkit-outer-spin-button,
-    .date-input-group input[type="number"]::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-    /* 数字ごとの色分け */
+    .current-row { background: #ffe6e6 !important; border-left: 4px solid #ff6b6b; }
+    .age-display { font-size: 12px; color: #666; }
+    .nav-button { color: white; border: none; padding: 10px 20px; margin: 0 5px; border-radius: 5px; cursor: pointer; transition: all 0.3s; }
+    .nav-button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    .btn-expand { background: linear-gradient(135deg, #10b981, #059669); }
+    .btn-collapse { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .btn-filter { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .btn-clear { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .expand-collapse-all { margin: 10px 0; }
     .maha-1 { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
     .maha-2 { background: linear-gradient(135deg, #f97316, #ea580c) !important; }
     .maha-3 { background: linear-gradient(135deg, #eab308, #ca8a04) !important; }
@@ -242,7 +99,6 @@
     .maha-7 { background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important; }
     .maha-8 { background: linear-gradient(135deg, #ec4899, #db2777) !important; }
     .maha-9 { background: linear-gradient(135deg, #f43f5e, #e11d48) !important; }
-
     .antara-1 { background: linear-gradient(135deg, #fca5a5, #ef4444) !important; }
     .antara-2 { background: linear-gradient(135deg, #fdba74, #f97316) !important; }
     .antara-3 { background: linear-gradient(135deg, #fde047, #eab308) !important; }
@@ -252,56 +108,11 @@
     .antara-7 { background: linear-gradient(135deg, #c4b5fd, #8b5cf6) !important; }
     .antara-8 { background: linear-gradient(135deg, #f9a8d4, #ec4899) !important; }
     .antara-9 { background: linear-gradient(135deg, #fda4af, #f43f5e) !important; }
-
-    /* ボタンの色分け */
-    .nav-button {
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        margin: 0 5px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .nav-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    /* 各ボタンごとの色 */
-    .btn-expand {
-        background: linear-gradient(135deg, #10b981, #059669);
-    }
-
-    .btn-collapse {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-    }
-
-    .btn-filter {
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-    }
-
-    .btn-clear {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-    }
-
-    .btn-back {
-        background: linear-gradient(135deg, #6366f1, #4f46e5);
-    }
-    /* スマホ対応 */
     @media (max-width: 768px) {
-        .input-section {
-            grid-template-columns: 1fr;
-            gap: 20px;
-            padding: 15px;
-        }
-        
-        .person-input input {
-            font-size: 16px; /* iOSのズーム防止 */
-        }
+        .input-section { grid-template-columns: 1fr; gap: 20px; padding: 15px; }
+        .person-input input { font-size: 16px; }
     }
-    </style>
+</style>
 {% endblock %}
 
 {% block content %}
@@ -309,14 +120,13 @@
 
 <!-- 入力セクション -->
 <div class="input-section">
-    <!-- 1人目 -->
     <div class="person-input">
         <h3 class="text-lg font-bold mb-3">１人目</h3>
         <div class="form-group">
             <label>なまえ:</label>
             <div class="flex gap-2 items-center">
                 <input type="text" id="personAName" value="１人目" placeholder="名前を入力"
-                    class="flex-1 min-w-0 px-2 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                    class="flex-1 min-w-0 px-2 py-2 text-base border-2 border-purple-300 rounded-lg">
                 {% if user.is_authenticated %}
                 <button onclick="openSavedModal(loadPersonToA, '1人目を選択')"
                     class="flex-shrink-0 w-10 h-10 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg text-sm transition">
@@ -328,18 +138,17 @@
         <div class="form-group">
             <label for="personABirth">生年月日:</label>
             <input type="date" id="personABirth" required
-                class="w-full px-2 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                class="w-full px-2 py-2 text-base border-2 border-purple-300 rounded-lg">
         </div>
     </div>
 
-    <!-- 2人め -->
     <div class="person-input">
         <h3 class="text-lg font-bold mb-3">２人目</h3>
         <div class="form-group">
             <label>なまえ:</label>
             <div class="flex gap-2 items-center">
                 <input type="text" id="personBName" value="２人目" placeholder="名前を入力"
-                    class="flex-1 min-w-0 px-2 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                    class="flex-1 min-w-0 px-2 py-2 text-base border-2 border-purple-300 rounded-lg">
                 {% if user.is_authenticated %}
                 <button onclick="openSavedModal(loadPersonToB, '2人目を選択')"
                     class="flex-shrink-0 w-10 h-10 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg text-sm transition">
@@ -351,7 +160,7 @@
         <div class="form-group">
             <label for="personBBirth">生年月日:</label>
             <input type="date" id="personBBirth" required
-                class="w-full px-2 py-2 text-base border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                class="w-full px-2 py-2 text-base border-2 border-purple-300 rounded-lg">
         </div>
     </div>
 
@@ -360,13 +169,13 @@
 
 <!-- 結果表示エリア -->
 <div id="resultsContainer" class="hidden">
-    <!-- タブ切り替え（総合鑑定と同じスタイル） -->
+    <!-- タブ -->
     <div class="flex border-b border-gray-300 mb-6">
-        <button onclick="switchCompareTab('grid')" id="tab-grid" 
+        <button onclick="switchCompareTab('grid')" id="tab-grid"
             class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-purple-600 text-purple-600">
             グリッド比較
         </button>
-        <button onclick="switchCompareTab('dasha')" id="tab-dasha" 
+        <button onclick="switchCompareTab('dasha')" id="tab-dasha"
             class="flex-1 py-3 px-4 font-semibold transition border-b-2 border-transparent text-gray-500 hover:text-gray-700">
             ダシャー比較
         </button>
@@ -379,14 +188,6 @@
 
     <!-- ダシャー比較タブ -->
     <div id="content-dasha" class="tab-content hidden">
-        <div id="filterSection" class="filter-section hidden">
-            <!-- フィルターの内容は同じ -->
-        </div>
-        <div id="dashaResults"></div>
-    </div>
-
-    <!-- ダシャー比較タブ -->
-    <div id="content-dasha" class="tab-content">
         <div id="filterSection" class="filter-section hidden">
             <h3>検索・フィルター</h3>
             <div class="filter-controls">
@@ -402,14 +203,10 @@
                     <label for="filterMaha">マハーダシャー:</label>
                     <select id="filterMaha">
                         <option value="">全て</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
+                        <option value="1">1</option><option value="2">2</option>
+                        <option value="3">3</option><option value="4">4</option>
+                        <option value="5">5</option><option value="6">6</option>
+                        <option value="7">7</option><option value="8">8</option>
                         <option value="9">9</option>
                     </select>
                 </div>
@@ -423,11 +220,6 @@
         </div>
         <div id="dashaResults"></div>
     </div>
-
-    <!-- グリッド比較タブ -->
-    <div id="content-grid" class="tab-content hidden">
-        <div id="gridResults"></div>
-    </div>
 </div>
 {% endblock %}
 
@@ -437,8 +229,6 @@ let allData = null;
 let filteredData = null;
 let personAData = null;
 let personBData = null;
-
-
 
 function getCookie(name) {
     let cookieValue = null;
@@ -456,35 +246,28 @@ function getCookie(name) {
 }
 
 function switchCompareTab(tabName) {
-    // タブボタンの切り替え
+    // タブボタン切り替え
     document.querySelectorAll('[id^="tab-"]').forEach(btn => {
         btn.classList.remove('border-purple-600', 'text-purple-600');
         btn.classList.add('border-transparent', 'text-gray-500');
     });
     document.getElementById('tab-' + tabName).classList.add('border-purple-600', 'text-purple-600');
     document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-gray-500');
-    
-    // コンテンツの切り替え
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.add('hidden');
-    });
+
+    // コンテンツ切り替え
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
     document.getElementById('content-' + tabName).classList.remove('hidden');
-    
-    // ダシャータブに切り替えた時、現在のダシャーまでスクロール
+
+    // ナビボタン表示制御
+    document.querySelectorAll('.dasha-nav-btn').forEach(btn => {
+        btn.style.display = tabName === 'dasha' ? 'flex' : 'none';
+    });
+
     if (tabName === 'dasha') {
+        setTimeout(() => scrollToCurrentRow(), 200);
+    } else if (tabName === 'grid') {
         setTimeout(() => {
-            const currentYear = new Date().getFullYear();
-            const currentYearHeader = Array.from(document.querySelectorAll('.year-header'))
-                .find(h => h.textContent.includes(`${currentYear}年`));
-            
-            if (currentYearHeader) {
-                // 現在の年を展開
-                currentYearHeader.classList.remove('collapsed');
-                currentYearHeader.nextElementSibling.classList.remove('collapsed');
-                
-                // スクロール
-                currentYearHeader.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            document.getElementById('gridResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
     }
 }
@@ -500,17 +283,28 @@ function compareAll() {
         return;
     }
 
+    // データを完全リセット
+    allData = null;
+    filteredData = null;
+    personAData = null;
+    personBData = null;
+
     document.getElementById('resultsContainer').classList.remove('hidden');
+    document.getElementById('gridResults').innerHTML = '<div class="text-center py-8">計算中...</div>';
     document.getElementById('dashaResults').innerHTML = '<div class="text-center py-8">計算中...</div>';
 
-    // ダシャー比較データを取得
+    setTimeout(() => {
+        document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+
+    // ダシャー比較
     fetch('/compare/calculate/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken')
         },
-        credentials: 'include',  // ← これがないとクッキーが送られない！
+        credentials: 'include',
         body: JSON.stringify({
             person_a_name: personAName,
             person_a_birth: personABirth,
@@ -518,50 +312,91 @@ function compareAll() {
             person_b_birth: personBBirth
         })
     })
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
         if (data.success) {
             allData = data;
             filteredData = data.timeline;
             document.getElementById('filterSection').classList.remove('hidden');
             displayDashaComparison();
+            ensureNavButtons();
         } else {
-            document.getElementById('dashaResults').innerHTML = `<div class="text-red-600 text-center">エラー: ${data.error}</div>`;
+            document.getElementById('dashaResults').innerHTML =
+                `<div class="text-red-600 text-center">エラー: ${data.error}</div>`;
         }
     })
-    .catch(error => {
-        document.getElementById('dashaResults').innerHTML = `<div class="text-red-600 text-center">エラー: ${error.message}</div>`;
+    .catch(e => {
+        document.getElementById('dashaResults').innerHTML =
+            `<div class="text-red-600 text-center">エラー: ${e.message}</div>`;
     });
 
-    // 各人の数秘術データを取得
-    fetchNumerologyData(personAName, personABirth, 'A');
-    fetchNumerologyData(personBName, personBBirth, 'B');
+    // 数秘術データを両方同時に取得してから表示
+    // 数秘術データを両方同時に取得してから表示
+    Promise.all([
+        fetch('/calculate/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: personAName, birth_date: personABirth })
+        }).then(r => r.json()),
+        fetch('/calculate/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: personBName, birth_date: personBBirth })
+        }).then(r => r.json())
+    ])
+    .then(([dataA, dataB]) => {
+        if (dataA.success && dataA.numerology) personAData = dataA.numerology;
+        if (dataB.success && dataB.numerology) personBData = dataB.numerology;
+
+        if (personAData && personBData) {
+            // allDataが来るまで最大5秒待つ
+            waitForAllDataThenShowGrid();
+        } else {
+            document.getElementById('gridResults').innerHTML =
+                '<div class="text-center py-8 text-gray-500">グリッドデータの取得に失敗しました</div>';
+        }
+    })
+    .catch(e => {
+        document.getElementById('gridResults').innerHTML =
+            `<div class="text-red-600 text-center">エラー: ${e.message}</div>`;
+    });
 }
 
-function fetchNumerologyData(name, birthDate, person) {
-    fetch('/calculate/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, birth_date: birthDate })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.numerology) {
-            if (person === 'A') {
-                personAData = data.numerology;
-            } else {
-                personBData = data.numerology;
-            }
-            
-            // 両方のデータが揃ったらグリッド比較を表示
-            if (personAData && personBData) {
-                displayGridComparison();
-            }
+
+function ensureNavButtons() {
+    // 既存のボタンを削除
+    document.querySelectorAll('.dasha-nav-btn').forEach(b => b.remove());
+
+    // ↑ボタン
+    const topBtn = document.createElement('button');
+    topBtn.innerHTML = '↑';
+    topBtn.title = 'ダシャー一覧の先頭へ';
+    topBtn.className = 'dasha-nav-btn fixed bottom-20 right-6 w-12 h-12 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-lg flex items-center justify-center text-xl z-40';
+    topBtn.style.display = 'none';
+    topBtn.onclick = () => document.getElementById('dashaResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.body.appendChild(topBtn);
+
+    // 今ボタン
+    const nowBtn = document.createElement('button');
+    nowBtn.innerHTML = '今';
+    nowBtn.title = '現在の行へ';
+    nowBtn.className = 'dasha-nav-btn fixed bottom-6 right-6 w-12 h-12 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center text-lg z-40';
+    nowBtn.style.display = 'none';
+    nowBtn.onclick = scrollToCurrentRow;
+    document.body.appendChild(nowBtn);
+}
+
+function scrollToCurrentRow() {
+    const currentRow = document.querySelector('#dashaResults .current-row');
+    if (currentRow) {
+        // 折りたたまれていたら展開
+        const parent = currentRow.closest('.year-content');
+        if (parent && parent.classList.contains('collapsed')) {
+            parent.classList.remove('collapsed');
+            parent.previousElementSibling.classList.remove('collapsed');
         }
-    })
-    .catch(error => {
-        console.error('数秘術データ取得エラー:', error);
-    });
+        currentRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 }
 
 function displayDashaComparison() {
@@ -569,21 +404,19 @@ function displayDashaComparison() {
     const today = new Date();
     const currentYear = today.getFullYear();
     const currentMonth = today.getMonth() + 1;
-    
+
     const yearGroups = {};
     filteredData.forEach(item => {
-        if (!yearGroups[item.year]) {
-            yearGroups[item.year] = [];
-        }
+        if (!yearGroups[item.year]) yearGroups[item.year] = [];
         yearGroups[item.year].push(item);
     });
-    
+
     let html = '<h2 class="text-xl font-bold mb-4">ダシャー比較結果</h2>';
-    
+
     Object.keys(yearGroups).sort((a, b) => a - b).forEach(year => {
         const isCurrentYear = parseInt(year) === currentYear;
         const yearData = yearGroups[year];
-        
+
         html += `
             <div class="year-group">
                 <div class="year-header ${isCurrentYear ? '' : 'collapsed'}" onclick="toggleYear(this)">
@@ -601,14 +434,12 @@ function displayDashaComparison() {
                         </thead>
                         <tbody>
         `;
-        
+
         yearData.forEach(item => {
             const isCurrentMonth = item.year === currentYear && item.month === currentMonth;
-            const rowClass = isCurrentMonth ? 'current-row' : '';
-            
-            html += `<tr class="${rowClass}">`;
+            html += `<tr class="${isCurrentMonth ? 'current-row' : ''}">`;
             html += `<td><strong>${item.date_str}</strong></td>`;
-            
+
             html += `<td>`;
             if (item.person_a_age !== null) {
                 html += `<div class="age-display">${item.person_a_age}歳</div>`;
@@ -619,10 +450,10 @@ function displayDashaComparison() {
                     }
                 }
             } else {
-                html += `<span style="color: #ccc;">未誕生</span>`;
+                html += `<span style="color:#ccc;">未誕生</span>`;
             }
             html += `</td>`;
-            
+
             html += `<td>`;
             if (item.person_b_age !== null) {
                 html += `<div class="age-display">${item.person_b_age}歳</div>`;
@@ -633,84 +464,66 @@ function displayDashaComparison() {
                     }
                 }
             } else {
-                html += `<span style="color: #ccc;">未誕生</span>`;
+                html += `<span style="color:#ccc;">未誕生</span>`;
             }
-            html += `</td>`;
-            html += `</tr>`;
+            html += `</td></tr>`;
         });
-        
-        html += `
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `;
+
+        html += `</tbody></table></div></div>`;
     });
-    
+
     html += `
-        <div style="margin-top: 20px; font-size: 14px; color: #666;">
+        <div style="margin-top:20px; font-size:14px; color:#666;">
             <p><span class="maha-number">5</span> = マハーダシャー番号</p>
             <p><span class="antara-number">3</span> = アンタラダシャー番号</p>
         </div>
     `;
-    
+
     resultsDiv.innerHTML = html;
-    
-    // 表示後、現在の年までスクロール（ダシャータブが表示されている場合のみ）
+
+    // ダシャータブが表示中なら現在行へスクロール
     if (!document.getElementById('content-dasha').classList.contains('hidden')) {
-        setTimeout(() => {
-            const currentYearHeader = Array.from(document.querySelectorAll('.year-header'))
-                .find(h => h.textContent.includes(`${currentYear}年`));
-            
-            if (currentYearHeader) {
-                currentYearHeader.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }, 100);
+        setTimeout(() => scrollToCurrentRow(), 300);
     }
 }
 
 function displayGridComparison() {
-    if (!personAData || !personBData) {
-        document.getElementById('gridResults').innerHTML = '<div class="text-center py-8">データ読み込み中...</div>';
+    if (!personAData || !personBData || !allData) {
+        document.getElementById('gridResults').innerHTML = 
+            '<div class="text-center py-8 text-gray-400">計算中...</div>';
         return;
     }
     
     const gridA = personAData.grid;
     const gridB = personBData.grid;
-    
+
     let html = `
         <h2 class="text-xl font-bold mb-4">グリッド比較</h2>
-        
-        <!-- 凡例 -->
         <div class="flex justify-center gap-6 mb-6 p-4 bg-gray-50 rounded-lg">
             <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded" style="background: linear-gradient(135deg, #a855f7, #9333ea);"></div>
+                <div class="w-6 h-6 rounded" style="background:linear-gradient(135deg,#a855f7,#9333ea);"></div>
                 <span class="font-semibold">${allData.person_a_name}</span>
             </div>
             <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div>
+                <div class="w-6 h-6 rounded" style="background:linear-gradient(135deg,#3b82f6,#2563eb);"></div>
                 <span class="font-semibold">${allData.person_b_name}</span>
             </div>
         </div>
-        
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            <!-- 人A -->
             <div>
                 <h3 class="text-lg font-bold text-center mb-4 text-purple-600">${allData.person_a_name}</h3>
                 <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto">
-                    ${[3,1,9,6,7,5,2,8,4].map(n => 
+                    ${[3,1,9,6,7,5,2,8,4].map(n =>
                         `<div class="aspect-square bg-white border-2 border-purple-300 rounded-lg flex items-center justify-center text-3xl font-bold text-purple-600">
                             ${gridA[n] || ''}
                         </div>`
                     ).join('')}
                 </div>
             </div>
-            
-            <!-- 人B -->
             <div>
                 <h3 class="text-lg font-bold text-center mb-4 text-blue-600">${allData.person_b_name}</h3>
                 <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto">
-                    ${[3,1,9,6,7,5,2,8,4].map(n => 
+                    ${[3,1,9,6,7,5,2,8,4].map(n =>
                         `<div class="aspect-square bg-white border-2 border-blue-300 rounded-lg flex items-center justify-center text-3xl font-bold text-blue-600">
                             ${gridB[n] || ''}
                         </div>`
@@ -718,46 +531,29 @@ function displayGridComparison() {
                 </div>
             </div>
         </div>
-        
-        <!-- 重ね合わせグリッド -->
         <div>
             <h3 class="text-lg font-bold text-center mb-4">重ね合わせ</h3>
             <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto">
                 ${[3,1,9,6,7,5,2,8,4].map(n => {
                     const strA = gridA[n] || '';
                     const strB = gridB[n] || '';
-                    
-                    // 人Aの数字（紫）と人Bの数字（青）を色分けして表示
                     let displayContent = '';
-                    
-                    // 人Aの数字を紫で表示
-                    if (strA) {
-                        displayContent += `<span style="color: #a855f7;">${strA}</span>`;
-                    }
-                    
-                    // 人Bの数字を青で表示
-                    if (strB) {
-                        displayContent += `<span style="color: #3b82f6;">${strB}</span>`;
-                    }
-                    
-                    // 持っていない場合は空のマス
-                    return `<div class="aspect-square bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center text-3xl font-bold p-2" style="letter-spacing: -3px; line-height: 1;">
+                    if (strA) displayContent += `<span style="color:#a855f7;">${strA}</span>`;
+                    if (strB) displayContent += `<span style="color:#3b82f6;">${strB}</span>`;
+                    return `<div class="aspect-square bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center text-3xl font-bold p-2" style="letter-spacing:-3px;line-height:1;">
                         ${displayContent || ''}
                     </div>`;
                 }).join('')}
             </div>
         </div>
     `;
-    
+
     document.getElementById('gridResults').innerHTML = html;
 }
 
-// 以下、既存の関数（toggleYear, expandAll, collapseAll, applyFilter, clearFilter）
-
 function toggleYear(header) {
     header.classList.toggle('collapsed');
-    const content = header.nextElementSibling;
-    content.classList.toggle('collapsed');
+    header.nextElementSibling.classList.toggle('collapsed');
 }
 
 function expandAll() {
@@ -774,14 +570,12 @@ function applyFilter() {
     const filterYear = document.getElementById('filterYear').value;
     const filterAge = document.getElementById('filterAge').value;
     const filterMaha = document.getElementById('filterMaha').value;
-    
     filteredData = allData.timeline.filter(item => {
         if (filterYear && item.year !== parseInt(filterYear)) return false;
         if (filterAge && item.person_a_age !== parseInt(filterAge) && item.person_b_age !== parseInt(filterAge)) return false;
         if (filterMaha && item.person_a_maha !== parseInt(filterMaha) && item.person_b_maha !== parseInt(filterMaha)) return false;
         return true;
     });
-    
     displayDashaComparison();
     expandAll();
 }
@@ -793,118 +587,6 @@ function clearFilter() {
     filteredData = allData.timeline;
     displayDashaComparison();
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    // localStorageの古いデータをクリア
-    localStorage.removeItem('personA_name');
-    localStorage.removeItem('personA_birth');
-    
-    // 総合鑑定の入力欄と同じキーから読み込む
-    const name = localStorage.getItem('last_name');
-    const year = localStorage.getItem('last_year');
-    const month = localStorage.getItem('last_month');
-    const day = localStorage.getItem('last_day');
-    
-    if (name) document.getElementById('personAName').value = name;
-    
-    if (year && month && day) {
-        const m = month.padStart(2, '0');
-        const d = day.padStart(2, '0');
-        document.getElementById('personABirth').value = `${year}-${m}-${d}`;
-    } else {
-        const today = new Date();
-        const thirtyYearsAgo = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
-        document.getElementById('personABirth').value = thirtyYearsAgo.toISOString().split('T')[0];
-    }
-    
-    const today = new Date();
-    const twentyFiveYearsAgo = new Date(today.getFullYear() - 25, today.getMonth(), today.getDate());
-    document.getElementById('personBBirth').value = twentyFiveYearsAgo.toISOString().split('T')[0];
-});
-
-// 保存リストを読み込んでセレクトボックスに表示
-{% if user.is_authenticated %}
-async function loadSavedPersonList() {
-    try {
-        const response = await fetch('/saved/list/api/');
-        const data = await response.json();
-        if (data.success) {
-            const select = document.getElementById('savedPersonSelect');
-            data.persons.forEach(p => {
-                const option = document.createElement('option');
-                option.value = p.id;
-                option.textContent = `${p.name}（${p.birth_year}/${p.birth_month}/${p.birth_day}）`;
-                select.appendChild(option);
-            });
-        }
-    } catch(e) {
-        console.error(e);
-    }
-}
-
-async function loadSavedPerson() {
-    const id = document.getElementById('savedPersonSelect').value;
-    if (!id) return;
-    
-    const response = await fetch(`/saved/${id}/load/`);
-    const data = await response.json();
-    
-    if (data.success) {
-        document.getElementById('personBName').value = data.person.name;
-        const m = String(data.person.birth_month).padStart(2, '0');
-        const d = String(data.person.birth_day).padStart(2, '0');
-        document.getElementById('personBBirth').value = `${data.person.birth_year}-${m}-${d}`;
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    loadSavedPersonList();
-    // 既存のDOMContentLoadedの内容もここに残す
-    const name = localStorage.getItem('last_name');
-    const year = localStorage.getItem('last_year');
-    const month = localStorage.getItem('last_month');
-    const day = localStorage.getItem('last_day');
-    
-    if (name) document.getElementById('personAName').value = name;
-    
-    if (year && month && day) {
-        const m = month.padStart(2, '0');
-        const d = day.padStart(2, '0');
-        document.getElementById('personABirth').value = `${year}-${m}-${d}`;
-    } else {
-        const today = new Date();
-        const thirtyYearsAgo = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
-        document.getElementById('personABirth').value = thirtyYearsAgo.toISOString().split('T')[0];
-    }
-    
-    const today = new Date();
-    const twentyFiveYearsAgo = new Date(today.getFullYear() - 25, today.getMonth(), today.getDate());
-    document.getElementById('personBBirth').value = twentyFiveYearsAgo.toISOString().split('T')[0];
-});
-{% else %}
-document.addEventListener('DOMContentLoaded', function() {
-    const name = localStorage.getItem('last_name');
-    const year = localStorage.getItem('last_year');
-    const month = localStorage.getItem('last_month');
-    const day = localStorage.getItem('last_day');
-    
-    if (name) document.getElementById('personAName').value = name;
-    
-    if (year && month && day) {
-        const m = month.padStart(2, '0');
-        const d = day.padStart(2, '0');
-        document.getElementById('personABirth').value = `${year}-${m}-${d}`;
-    } else {
-        const today = new Date();
-        const thirtyYearsAgo = new Date(today.getFullYear() - 30, today.getMonth(), today.getDate());
-        document.getElementById('personABirth').value = thirtyYearsAgo.toISOString().split('T')[0];
-    }
-    
-    const today = new Date();
-    const twentyFiveYearsAgo = new Date(today.getFullYear() - 25, today.getMonth(), today.getDate());
-    document.getElementById('personBBirth').value = twentyFiveYearsAgo.toISOString().split('T')[0];
-});
-{% endif %}
 
 function loadPersonToA(person) {
     document.getElementById('personAName').value = person.name;
@@ -920,5 +602,46 @@ function loadPersonToB(person) {
     document.getElementById('personBBirth').value = `${person.birth_year}-${m}-${d}`;
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    localStorage.removeItem('personA_name');
+    localStorage.removeItem('personA_birth');
+
+    const name = localStorage.getItem('last_name');
+    const year = localStorage.getItem('last_year');
+    const month = localStorage.getItem('last_month');
+    const day = localStorage.getItem('last_day');
+
+    if (name) document.getElementById('personAName').value = name;
+    if (year && month && day) {
+        document.getElementById('personABirth').value =
+            `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
+    } else {
+        const today = new Date();
+        const ago = new Date(today.getFullYear()-30, today.getMonth(), today.getDate());
+        document.getElementById('personABirth').value = ago.toISOString().split('T')[0];
+    }
+
+    const today = new Date();
+    const ago25 = new Date(today.getFullYear()-25, today.getMonth(), today.getDate());
+    document.getElementById('personBBirth').value = ago25.toISOString().split('T')[0];
+});
+
+function waitForAllDataThenShowGrid(retryCount = 0) {
+    if (allData) {
+        // allDataが揃ったので表示
+        displayGridComparison();
+        if (!document.getElementById('content-grid').classList.contains('hidden')) {
+            setTimeout(() => {
+                document.getElementById('gridResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 200);
+        }
+    } else if (retryCount < 20) {
+        // 0.25秒待ってリトライ（最大5秒）
+        setTimeout(() => waitForAllDataThenShowGrid(retryCount + 1), 250);
+    } else {
+        document.getElementById('gridResults').innerHTML =
+            '<div class="text-center py-8 text-gray-500">タイムアウトしました。再度試してください。</div>';
+    }
+}
 </script>
 {% endblock %}

@@ -163,7 +163,6 @@ function calculateAll() {
         return;
     }
     
-    // LocalStorageに保存
     localStorage.setItem('last_name', name);
     localStorage.setItem('last_year', document.getElementById('birthYear').value);
     localStorage.setItem('last_month', document.getElementById('birthMonth').value);
@@ -172,6 +171,11 @@ function calculateAll() {
     
     document.getElementById('results').classList.remove('hidden');
     document.getElementById('numerologyResults').innerHTML = '<div class="text-center py-8">計算中...</div>';
+    
+    // 結果エリアにスクロール
+    setTimeout(() => {
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
     
     fetch('/calculate/', {
         method: 'POST',
@@ -188,6 +192,11 @@ function calculateAll() {
             currentData = data;
             if (data.numerology) {
                 displayNumerology(data.numerology);
+                // グリッドにスクロール
+                setTimeout(() => {
+                    const gridEl = document.getElementById('gridSection');
+                    if (gridEl) gridEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 200);
             } else {
                 document.getElementById('numerologyResults').innerHTML = 
                     '<div class="text-center py-8 text-gray-500">名前を入力すると数秘術結果が表示されます</div>';
@@ -229,41 +238,70 @@ function switchTab(tabName) {
 }
 
 function displayDasha(dashaData) {
-    const html = `
-        <h3 class="text-xl font-bold text-gray-800 mb-4">ダシャー（開始番号: ${dashaData.start_number}）</h3>
-        <div class="space-y-4">
-            ${dashaData.periods.map(period => `
-                <div class="border-2 ${period.is_current ? 'border-red-500 bg-red-50' : 'border-gray-200'} rounded-lg overflow-hidden">
-                    <div class="bg-gradient-to-r from-purple-500 to-blue-500 text-white p-4">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <span class="text-3xl font-bold">${period.maha_dasha}</span>
-                                <span class="ml-3">マハーダシャー ${period.maha_dasha} (${period.years}年間)</span>
-                            </div>
-                            <div class="text-right text-sm">
-                                <div>${period.start_date} 〜 ${period.end_date}</div>
-                                <div>${period.start_age}歳〜${period.end_age}歳</div>
-                            </div>
-                        </div>
+    const periodsHtml = dashaData.periods.map(period => `
+        <div class="border-2 ${period.is_current ? 'border-red-500 bg-red-50' : 'border-gray-200'} rounded-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-500 to-blue-500 text-white p-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="text-3xl font-bold">${period.maha_dasha}</span>
+                        <span class="ml-3">マハーダシャー ${period.maha_dasha} (${period.years}年間)</span>
                     </div>
-                    <div class="p-4 space-y-2">
-                        ${period.antara_dashas.map(antara => `
-                            <div class="flex justify-between items-center p-3 rounded ${antara.is_current ? 'bg-red-100 border-2 border-red-400' : 'bg-gray-50'}">
-                                <div>
-                                    <span class="inline-block w-8 h-8 bg-green-500 text-white rounded-full text-center leading-8 font-bold mr-2">${antara.number}</span>
-                                    <span class="font-medium">アンタラダシャー ${antara.number} (${antara.days}日間)</span>
-                                </div>
-                                <div class="text-sm text-gray-600">
-                                    ${antara.start_date} 〜 ${antara.end_date} (${antara.start_age}歳〜${antara.end_age}歳)
-                                </div>
-                            </div>
-                        `).join('')}
+                    <div class="text-right text-sm">
+                        <div>${period.start_date} 〜 ${period.end_date}</div>
+                        <div>${period.start_age}歳〜${period.end_age}歳</div>
                     </div>
                 </div>
-            `).join('')}
+            </div>
+            <div class="p-4 space-y-2">
+                ${period.antara_dashas.map(antara => `
+                    <div class="flex justify-between items-center p-3 rounded ${antara.is_current ? 'bg-red-100 border-2 border-red-400' : 'bg-gray-50'}">
+                        <div>
+                            <span class="inline-block w-8 h-8 bg-green-500 text-white rounded-full text-center leading-8 font-bold mr-2">${antara.number}</span>
+                            <span class="font-medium">アンタラダシャー ${antara.number} (${antara.days}日間)</span>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            ${antara.start_date} 〜 ${antara.end_date} (${antara.start_age}歳〜${antara.end_age}歳)
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
         </div>
+    `).join('');
+
+    const html = `
+        <h3 class="text-xl font-bold text-gray-800 mb-4" id="dashaTop">ダシャー（開始番号: ${dashaData.start_number}）</h3>
+        <div class="space-y-4">
+            ${periodsHtml}
+        </div>
+        <!-- 上に戻るボタン -->
+        <button onclick="document.getElementById('dashaTop').scrollIntoView({behavior:'smooth'})"
+            class="fixed bottom-20 right-6 w-12 h-12 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-lg flex items-center justify-center text-xl z-40">
+            ↑
+        </button>
+        <!-- 現在のダシャーへジャンプボタン -->
+        <button onclick="scrollToCurrentDasha()"
+            class="fixed bottom-6 right-6 w-12 h-12 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center text-lg z-40">
+            今
+        </button>
     `;
     document.getElementById('dashaResults').innerHTML = html;
+
+    // ダシャータブ表示時に現在のダシャーへ自動スクロール
+    setTimeout(() => scrollToCurrentDasha(), 300);
+}
+
+function scrollToCurrentDasha() {
+    // 現在のアンタラダシャー（赤枠）を探す
+    const currentAntara = document.querySelector('#dashaResults .border-red-400');
+    if (currentAntara) {
+        currentAntara.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+    // なければ現在のマハーダシャー（赤枠）を探す
+    const currentMaha = document.querySelector('#dashaResults .border-red-500');
+    if (currentMaha) {
+        currentMaha.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 }
 
 function displayNumerology(numData) {
@@ -280,16 +318,33 @@ function displayNumerology(numData) {
     };
     
     const meanings = {
-        1: '自我、自信、エゴ、プライド、地位、名誉、権力、バイタリティ',
-        2: '心、精神、変化、豊かさ、日常、家庭生活、内面',
-        3: '知恵、知識、道徳、幸運、修行、英知、拡大、発展、マントラ、先生',
-        4: '外交的、貪欲、中毒、快楽主義、物質主義',
-        5: '知識、学び、言葉、コミュニケーション、思考、星占術',
-        6: '恋愛、結婚、芸術、生物、音楽、文化、贅沢',
-        7: '内向的、純粋、無欲、禁欲主義、直感、オカルト',
-        8: '試練、努力、苦悩、障害、奉仕、農業、改革、奴隷',
-        9: '情熱、行動、集中力、欲望、怒り、短期、火、闘争、衝動'
-    };
+            1: '自我、自信、エゴ、プライド、地位、名誉、権力、バイタリティ',
+            2: '心、精神、変化、豊かさ、日常、家庭生活、内面',
+            3: '知恵、知識、道徳、幸運、修行、英知、拡大、発展、マントラ、先生',
+            4: '外交的、貪欲、中毒、快楽主義、物質主義',
+            5: '知識、学び、言葉、コミュニケーション、思考、星占術',
+            6: '恋愛、結婚、芸術、生物、音楽、文化、贅沢',
+            7: '内向的、純粋、無欲、禁欲主義、直感、オカルト',
+            8: '試練、努力、苦悩、障害、奉仕、農業、改革、奴隷',
+            9: '情熱、行動、集中力、欲望、怒り、短期、火、闘争、衝動'
+        };
+
+        const karmaMeanings = {
+            0: '魂の成長・お役目を全うする時期。カルマの縛りが無い分、自分の方向性を進んでいける。カルマに向き合った先であっても本当の意味での役目に進んでいけない。ダルマの道に進んでいく段階。迷い・葛藤が多い。',
+            1: '自我、自信、エゴ、プライド、地位、名誉、権力、バイタリティ',
+            2: '心、精神、変化、豊かさ、日常、家庭生活、内面',
+            3: '知恵、知識、道徳、幸運、修行、英知、拡大、発展、マントラ、先生',
+            4: '外交的、貪欲、中毒、快楽主義、物質主義',
+            5: '知識、学び、言葉、コミュニケーション、思考、星占術',
+            6: '恋愛、結婚、芸術、生物、音楽、文化、贅沢',
+            7: '内向的、純粋、無欲、禁欲主義、直感、オカルト',
+            8: '試練、努力、苦悩、障害、奉仕、農業、改革、奴隷',
+            9: '情熱、行動、集中力、欲望、怒り、短期、火、闘争、衝動'
+        };
+
+const karmaColorClass = numData.karma.final === 0 
+    ? 'bg-gradient-to-r from-purple-400 to-pink-400 text-white' 
+    : numberColors[numData.karma.final];
     
     const html = `
         <!--
@@ -301,7 +356,7 @@ function displayNumerology(numData) {
         -->
             
             <!-- グリッド -->
-            <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6">
+            <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6" id="gridSection">
                 <h3 class="text-xl font-bold text-center mb-4">グリッド</h3>
                 <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto">
                     ${[3,1,9,6,7,5,2,8,4].map(n => 
@@ -332,11 +387,11 @@ function displayNumerology(numData) {
                     <div class="text-4xl md:text-5xl font-bold mb-2">${numData.name_number.final}</div>
                     <p class="text-xs leading-relaxed">${meanings[numData.name_number.final]}</p>
                 </div>
-                <div class="p-4 md:p-6 rounded-lg text-center ${numberColors[numData.karma.final]}">
+                <div class="p-4 md:p-6 rounded-lg text-center ${karmaColorClass}">
                     <h4 class="text-sm font-bold mb-2">カルマ</h4>
                     <p class="text-xs mb-2 opacity-80">過去世からの課題</p>
                     <div class="text-4xl md:text-5xl font-bold mb-2">${numData.karma.final}</div>
-                    <p class="text-xs leading-relaxed">${meanings[numData.karma.final]}</p>
+                    <p class="text-xs leading-relaxed">${karmaMeanings[numData.karma.final]}</p>
                 </div>
             </div>
 

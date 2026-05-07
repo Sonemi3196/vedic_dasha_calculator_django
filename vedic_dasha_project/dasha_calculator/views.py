@@ -250,7 +250,6 @@ def hiragana_to_romaji(text):
         "じゃ": "ja",  "じゅ": "ju",  "じょ": "jo",
     }
 
-    # 基本変換（濁音・半濁音含む）
     table = {
         "し": "shi", "ち": "chi", "つ": "tsu", "ふ": "fu",
         "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
@@ -277,13 +276,13 @@ def hiragana_to_romaji(text):
     while i < len(n):
         two = n[i:i+2]
 
-        # ① 拗音（しょ・きょ・ちょ など）
+        # ① 拗音
         if two in youon:
             result += youon[two]
             i += 2
             continue
 
-        # ② ★ 拗音の後の「う」は完全に無視（しょう→sho）
+        # ② 拗音の後の「う」は無視（しょう→sho）
         if n[i] == "う" and result.endswith((
             "kya","kyu","kyo",
             "sha","shu","sho",
@@ -317,7 +316,13 @@ def hiragana_to_romaji(text):
             i += 2
             continue
 
-        # ⑥ 撥音（ん → M/B/P 前は M）
+        # ⑥ うう → u
+        if two == "うう":
+            result += "u"
+            i += 2
+            continue
+
+        # ⑦ 撥音（ん）
         if n[i] == "ん":
             if i+1 < len(n) and table.get(n[i+1], "").startswith(("b", "m", "p")):
                 result += "m"
@@ -326,9 +331,14 @@ def hiragana_to_romaji(text):
             i += 1
             continue
 
-        # ⑦ 通常
+        # ⑧ 通常
         result += table.get(n[i], "")
         i += 1
+
+    # ⑨ ループ後に長音処理（念のため残す）
+    result = result.replace('ou', 'o')
+    result = result.replace('oo', 'o')
+    result = result.replace('uu', 'u')
 
     return result.upper()
 
@@ -463,11 +473,13 @@ def calculate_numerology_for_name(name, birth_date):
     month = birth_date.month
     day = birth_date.day
     
-    # 全ての数字を足す
     all_sum = sum(int(d) for d in str(year) + str(month) + str(day))
-    
-    # 日付を引く
     karma_base = all_sum - day
+    
+    # 絶対値を取る（マイナスにならないように）
+    karma_base = abs(karma_base)
+    
+    
     
     # 一桁になるまで計算
     def reduce_to_single(num):
@@ -477,6 +489,7 @@ def calculate_numerology_for_name(name, birth_date):
             steps.append(num)
         return {'final': num, 'steps': steps}
     
+    #karma_number = reduce_to_single(karma_base)
     karma_number = reduce_to_single(karma_base)
 
     digit_count = {}
